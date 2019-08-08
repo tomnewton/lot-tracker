@@ -2,7 +2,8 @@
     "name": "default",
     "version": "1.0.0",
     "scripts": {
-        "start-dev": "rm -rf ./dist && ./node_modules/.bin/tsc && yarn start",
+        "build": "./node_modules/.bin/tsc",
+        "start-dev": "rm -rf ./dist && yarn build && yarn start",
         "start": "node ./dist/server.js"
     },
     "prettier": {
