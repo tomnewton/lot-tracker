@@ -1,0 +1,62 @@
+version: 2
+
+aliases:
+  - &defaults
+    working_directory: ~/app
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:10.16.1
+
+  - &init-gcloud
+    run:
+      name: Prep gcloud
+      command: |
+        echo $GCLOUD_SERVICE_KEY_DEV > ${HOME}/gcloud-service-key.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+        gcloud config set project ${GCLOUD_PROJECT_DEV}
+        gcloud auth configure-docker --quiet
+        gcloud info
+
+  - &generate-and-set-version-env
+    run: 
+      name: Generate & set version
+      command: |
+        echo 'export VERSION=${CIRCLE_TAG//\./-}' >> $BASH_ENV
+        source $BASH_ENV
+
+  - &update-gcloud-components 
+    run:
+      name: update gcloud components 
+      command: |
+        apt-get update
+
+  - &yarn-init
+    run:
+      name: yarn init
+      command: |
+        yarn config set workspaces-experimental true
+        yarn install --frozen-lockfile
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+      - *update-gcloud-components
+      - *init-gcloud
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "services/default/package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - *yarn-init
+      - run: cd services/default/ && yarn build
+    
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "services/default/package.json" }}
+      
+      - run: gcloud app deploy
