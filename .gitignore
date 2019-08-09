@@ -2,6 +2,7 @@
 **/dist
 
 .env
+/keys
 
 # Logs
 logs
