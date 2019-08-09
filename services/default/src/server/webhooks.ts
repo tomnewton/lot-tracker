@@ -1,7 +1,7 @@
 import express from 'express';
 import getRawBody from 'raw-body';
 import crypto from 'crypto';
-import {enqueueJob, client} from './jobs';
+import {enqueueJob, client} from './tasks';
 
 export const webhooks = express.Router();
 
