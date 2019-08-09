@@ -1,2 +1,2 @@
-export {enqueueJob} from './create';
+export {createTask} from './create';
 export {client} from './client';

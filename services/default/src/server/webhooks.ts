@@ -1,7 +1,7 @@
 import express from 'express';
 import getRawBody from 'raw-body';
 import crypto from 'crypto';
-import {enqueueJob, client} from './tasks';
+import {createTask, client} from './tasks';
 
 export const webhooks = express.Router();
 
@@ -19,7 +19,7 @@ webhooks.post(
   '/orders/create',
   asyncMiddleware(async (req: express.Request, res: express.Response) => {
     console.log(req.body);
-    await enqueueJob(process.env.DEFAULT_QUEUE, req.body, client);
+    await createTask(process.env.DEFAULT_QUEUE, req.body, client);
   }),
 );
 
@@ -27,7 +27,7 @@ webhooks.post(
   '/fulfillment/create',
   asyncMiddleware(async (req: express.Request, res: express.Response) => {
     console.log(req.body);
-    await enqueueJob(process.env.DEFAULT_QUEUE, req.body, client);
+    await createTask(process.env.DEFAULT_QUEUE, req.body, client);
   }),
 );
 
