@@ -1,22 +1,34 @@
 import express from 'express';
 import getRawBody from 'raw-body';
 import crypto from 'crypto';
+import {enqueueJob} from './job';
 
 export const webhooks = express.Router();
-webhooks.use(verify);
+
+const asyncMiddleware = (fn: any) => (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+webhooks.use(asyncMiddleware(verify));
 
 webhooks.post(
   '/orders/create',
-  (req: express.Request, res: express.Response) => {
+  asyncMiddleware(async (req: express.Request, res: express.Response) => {
     console.log(req.body);
-  },
+    await enqueueJob(process.env.DEFAULT_QUEUE, req.body);
+  }),
 );
 
 webhooks.post(
   '/fulfillment/create',
-  (req: express.Request, res: express.Response) => {
+  asyncMiddleware(async (req: express.Request, res: express.Response) => {
     console.log(req.body);
-  },
+    await enqueueJob(process.env.DEFAULT_QUEUE, req.body);
+  }),
 );
 
 // Verify incoming webhooks.
@@ -35,7 +47,7 @@ async function verify(
     .digest('base64');
 
   if (genHash === hmac) {
-    return next();
+    return await next();
   }
   res.status(401);
   res.end();
