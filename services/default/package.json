@@ -5,7 +5,7 @@
         "build": "./node_modules/.bin/tsc",
         "start-dev": "rm -rf ./dist && yarn build && yarn start",
         "start": "node ./dist/server.js",
-        "test": "./node_modules/.bin/jest"
+        "test": "./node_modules/.bin/jest --rootDir=./src"
     },
     "prettier": {
         "printWidth": 80,
