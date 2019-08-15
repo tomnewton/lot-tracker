@@ -4,7 +4,8 @@
     "scripts": {
         "build": "./node_modules/.bin/tsc",
         "start-dev": "rm -rf ./dist && yarn build && yarn start",
-        "start": "node ./dist/server.js"
+        "start": "node ./dist/server.js",
+        "test": "./node_modules/.bin/jest"
     },
     "prettier": {
         "printWidth": 80,
@@ -23,12 +24,19 @@
         "raw-body": "^2.4.1"
     },
     "devDependencies": {
+        "@babel/core": "^7.5.5",
+        "@babel/preset-env": "^7.5.5",
+        "@babel/preset-typescript": "^7.3.3",
         "@types/dotenv": "^6.1.1",
         "@types/duplexify": "^3.6.0",
         "@types/express": "^4.17.0",
         "@types/google-cloud__tasks": "^0.2.1",
+        "@types/jest": "^24.0.17",
         "@types/node": "^12.7.1",
+        "babel-jest": "^24.8.0",
+        "jest": "^24.8.0",
         "prettier": "1.18.2",
+        "supertest": "^4.0.2",
         "typescript": "^3.5.3"
     }
 }
