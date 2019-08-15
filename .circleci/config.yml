@@ -37,6 +37,11 @@ aliases:
         yarn config set workspaces-experimental true
         yarn install --frozen-lockfile
 
+  - &run-tests
+    run: 
+      name: run tests
+      command: |
+        cd services/default/ && yarn test
 jobs:
   build:
     <<: *defaults
@@ -53,6 +58,7 @@ jobs:
 
       - *yarn-init
       - run: cd services/default/ && yarn build
+      - *run-tests
     
       - save_cache:
           paths:
