@@ -7,13 +7,23 @@ aliases:
       # specify the version you desire here
       - image: tomnewton/lot-tracker-build:latest
 
-  - &init-gcloud
+  - &init-gcloud-dev
     run:
       name: Prep gcloud
       command: |
         echo $GCLOUD_SERVICE_KEY_DEV > ${HOME}/gcloud-service-key.json
         gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
         gcloud config set project ${GCLOUD_PROJECT_DEV}
+        gcloud auth configure-docker --quiet
+        gcloud info
+
+  - &init-gcloud-production
+    run: 
+      name: Prep gcloud production
+      command: | 
+        echo $GOOGLE_SERVICE_KEY_PRODUCTION > ${HOME}/gcloud-service-key.json
+        gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+        gcloud config set project ${GOOGLE_PROJECT_PRODUCTION}
         gcloud auth configure-docker --quiet
         gcloud info
 
@@ -48,7 +58,7 @@ jobs:
     steps:
       - checkout
       - *update-gcloud-components
-      - *init-gcloud
+      - *init-gcloud-dev
       # Download and cache dependencies
       - restore_cache:
           keys:
