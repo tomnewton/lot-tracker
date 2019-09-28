@@ -20,7 +20,7 @@
         "@google-cloud/tasks": "^1.2.1",
         "crypto": "^1.0.1",
         "dotenv": "^8.0.0",
-        "express": "^4.16.3",
+        "express": "^4.17.1",
         "raw-body": "^2.4.1"
     },
     "devDependencies": {
@@ -29,7 +29,7 @@
         "@babel/preset-typescript": "^7.3.3",
         "@types/dotenv": "^6.1.1",
         "@types/duplexify": "^3.6.0",
-        "@types/express": "^4.17.0",
+        "@types/express": "^4.17.1",
         "@types/google-cloud__tasks": "^0.2.1",
         "@types/jest": "^24.0.17",
         "@types/node": "^12.7.1",

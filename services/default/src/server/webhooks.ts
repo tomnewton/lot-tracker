@@ -1,23 +1,22 @@
-import express from 'express';
 import getRawBody from 'raw-body';
 import crypto from 'crypto';
 import {createTask, client} from './tasks';
-
-export const webhooks = express.Router();
+import {Router, Request, Response, NextFunction} from 'express';
 
 const asyncMiddleware = (fn: any) => (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
 
+export let webhooks = Router();
 webhooks.use(asyncMiddleware(verify));
 
 webhooks.post(
   '/orders/create',
-  asyncMiddleware(async (req: express.Request, res: express.Response) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     console.log(req.body);
     await createTask(process.env.DEFAULT_QUEUE, req.body, client);
   }),
@@ -25,18 +24,14 @@ webhooks.post(
 
 webhooks.post(
   '/fulfillment/create',
-  asyncMiddleware(async (req: express.Request, res: express.Response) => {
+  asyncMiddleware(async (req: Request, res: Response) => {
     console.log(req.body);
     await createTask(process.env.DEFAULT_QUEUE, req.body, client);
   }),
 );
 
 // Verify incoming webhooks.
-async function verify(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) {
+async function verify(req: Request, res: Response, next: NextFunction) {
   const hmac = req.get('X-Shopify-Hmac-Sha256');
   const payload = await getRawBody(req);
   const message = payload.toString();
