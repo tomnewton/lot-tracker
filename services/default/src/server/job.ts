@@ -10,6 +10,7 @@ export async function enqueueJob(
     process.env.LOCATION,
     queue,
   );
+  console.log(`queuePath: ${parent}`);
   const task = {
     appEngineHttpRequest: {
       httpMethod: 'POST',
