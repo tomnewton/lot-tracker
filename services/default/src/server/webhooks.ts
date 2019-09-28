@@ -16,17 +16,19 @@ webhooks.use(asyncMiddleware(verify));
 
 webhooks.post(
   '/orders/create',
-  asyncMiddleware(async (req: Request, res: Response) => {
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
     await createTask(process.env.DEFAULT_QUEUE, req.body, client);
+    next();
   }),
 );
 
 webhooks.post(
   '/fulfillment/create',
-  asyncMiddleware(async (req: Request, res: Response) => {
+  asyncMiddleware(async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
     await createTask(process.env.DEFAULT_QUEUE, req.body, client);
+    next();
   }),
 );
 
