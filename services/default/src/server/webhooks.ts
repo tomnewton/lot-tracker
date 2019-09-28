@@ -42,7 +42,7 @@ async function verify(
   const message = payload.toString();
   req.body = message;
   const genHash = crypto
-    .createHmac('sha256', process.env.SHOPIFY_APP_WEBHOOK_SECRET)
+    .createHmac('sha256', process.env.SHOPIFY_SECRET)
     .update(message)
     .digest('base64');
 
