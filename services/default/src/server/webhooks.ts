@@ -32,12 +32,11 @@ webhooks.post(
 
 // Verify incoming webhooks.
 async function verify(req: Request, res: Response, next: NextFunction) {
-  return await next();
   const hmac = req.get('X-Shopify-Hmac-Sha256');
   const payload = await getRawBody(req);
   const message = payload.toString();
   req.body = message;
-
+  return await next();
   const genHash = crypto
     .createHmac('sha256', process.env.SHOPIFY_SECRET)
     .update(message)
