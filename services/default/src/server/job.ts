@@ -6,7 +6,7 @@ export async function enqueueJob(
   client: CloudTasksClient,
 ) {
   const parent = client.queuePath(
-    process.env.PROJECT,
+    process.env.GOOGLE_CLOUD_PROJECT,
     process.env.LOCATION,
     queue,
   );
