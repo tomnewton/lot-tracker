@@ -6,10 +6,11 @@ export async function createTask(
   client: CloudTasksClient,
 ) {
   const parent = client.queuePath(
-    process.env.PROJECT,
+    process.env.GOOGLE_CLOUD_PROJECT,
     process.env.LOCATION,
     queue,
   );
+  console.log(`queue: ${parent}`);
   const task = {
     appEngineHttpRequest: {
       httpMethod: 'POST',
