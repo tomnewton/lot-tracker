@@ -36,14 +36,13 @@ async function verify(req: Request, res: Response, next: NextFunction) {
   const payload = await getRawBody(req);
   const message = payload.toString();
   req.body = message;
-  return await next();
   const genHash = crypto
     .createHmac('sha256', process.env.SHOPIFY_SECRET)
     .update(message)
     .digest('base64');
 
   if (genHash === hmac) {
-    return await next();
+    return next();
   }
   res.status(401);
   res.end();
