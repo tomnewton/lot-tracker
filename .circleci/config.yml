@@ -58,7 +58,7 @@ jobs:
     steps:
       - checkout
       - *update-gcloud-components
-      - *init-gcloud-dev
+      - *init-gcloud-production
       # Download and cache dependencies
       - restore_cache:
           keys:
