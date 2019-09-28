@@ -19,6 +19,7 @@ webhooks.post(
   asyncMiddleware(async (req: Request, res: Response) => {
     console.log('new order');
     await createTask(process.env.DEFAULT_QUEUE, req.body, client);
+    res.status(200).end();
   }),
 );
 
@@ -27,6 +28,7 @@ webhooks.post(
   asyncMiddleware(async (req: Request, res: Response) => {
     console.log('fulfillment created');
     await createTask(process.env.DEFAULT_QUEUE, req.body, client);
+    res.status(200).end();
   }),
 );
 

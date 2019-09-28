@@ -1,6 +1,6 @@
 import CloudTasksClient from '@google-cloud/tasks';
 
-export async function enqueueJob(
+/*export async function enqueueJob(
   queue: string,
   payload: string,
   client: CloudTasksClient,
@@ -25,4 +25,4 @@ export async function enqueueJob(
   const [response] = await client.createTask(request);
   const name = response.name;
   console.log(`Created task ${name}`);
-}
+}*/
