@@ -41,9 +41,10 @@ async function verify(req: Request, res: Response, next: NextFunction) {
     .update(message)
     .digest('base64');
 
-  if (genHash === hmac) {
-    return next();
+  if (genHash != hmac) {
+    res.status(401);
+    res.end();
+    return;
   }
-  res.status(401);
-  res.end();
+  next();
 }
