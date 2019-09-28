@@ -36,6 +36,7 @@ async function verify(req: Request, res: Response, next: NextFunction) {
   const payload = await getRawBody(req);
   const message = payload.toString();
   req.body = message;
+
   const genHash = crypto
     .createHmac('sha256', process.env.SHOPIFY_SECRET)
     .update(message)

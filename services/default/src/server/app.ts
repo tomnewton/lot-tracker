@@ -1,4 +1,4 @@
-import express = require('express');
+import express from 'express';
 import {config} from 'dotenv';
 import {webhooks} from './webhooks';
 
