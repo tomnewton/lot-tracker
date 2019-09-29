@@ -7,6 +7,7 @@ import getRawBody from 'raw-body';
 import {OAuth2Client} from 'google-auth-library';
 import {GetTokenResponse} from 'google-auth-library/build/src/auth/oauth2client';
 import {LoginTicket} from 'google-auth-library/build/src/auth/loginticket';
+import {upsertUser, User} from './db';
 
 config();
 export const app = express();
@@ -33,8 +34,8 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
   console.log('/authcode');
   const body = await getRawBody(req);
   const code = body.toString();
-  await verify(code);
-  res.send('0k');
+  const user = await verify(code);
+  // create a session
 });
 
 const client = new OAuth2Client(
@@ -42,26 +43,29 @@ const client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_SECRET,
 );
 
-async function verify(code: string): Promise<boolean> {
-  try {
-    const response: GetTokenResponse = await client.getToken({
-      code: code,
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      redirect_uri: 'http://localhost:8080',
-    });
+async function verify(code: string): Promise<User> {
+  const response: GetTokenResponse = await client.getToken({
+    code: code,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    redirect_uri: 'http://localhost:8080',
+  });
 
-    const loginTicket: LoginTicket = await client.verifyIdToken({
-      idToken: response.tokens.id_token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+  const loginTicket: LoginTicket = await client.verifyIdToken({
+    idToken: response.tokens.id_token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
 
-    const payload = loginTicket.getPayload();
-    if (payload.hd !== 'letsnixit.com') {
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.error(`auth issue: ${e.message}`);
-    return false;
+  const payload = loginTicket.getPayload();
+  if (payload.hd !== 'letsnixit.com') {
+    throw new Error('Only letsnixit.com accounts are authorized.');
   }
+
+  return await upsertUser({
+    firstName: payload.given_name,
+    lastName: payload.family_name,
+    email: payload.email,
+    refreshToken: response.tokens.refresh_token,
+    accessToken: response.tokens.access_token,
+    expiryDate: new Date(response.tokens.expiry_date),
+  });
 }
