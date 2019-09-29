@@ -15,18 +15,9 @@ export let webhooks = Router();
 webhooks.use(asyncMiddleware(verify));
 
 webhooks.post(
-  '/orders/create',
+  '/orders/fulfilled',
   asyncMiddleware(async (req: Request, res: Response) => {
-    console.log('new order');
-    await createTask(process.env.DEFAULT_QUEUE, req.body, client);
-    res.status(200).end();
-  }),
-);
-
-webhooks.post(
-  '/fulfillment/create',
-  asyncMiddleware(async (req: Request, res: Response) => {
-    console.log('fulfillment created');
+    console.log('order fulfilled');
     await createTask(process.env.DEFAULT_QUEUE, req.body, client);
     res.status(200).end();
   }),
