@@ -41,12 +41,20 @@ app.use(function(
   next: express.NextFunction,
 ) {
   console.log(req.path);
-  if (!req.session.user && req.path !== 'LOGIN_PATH') {
-    res.redirect('LOGIN_PATH');
+
+  // allow access to /login page.
+  if (req.path !== LOGIN_PATH) {
+    return next();
+  }
+
+  // not logged in
+  if (!req.session.user) {
+    res.redirect(LOGIN_PATH);
     res.end();
     return;
   }
 
+  // logged in
   next();
 });
 
@@ -64,7 +72,7 @@ app.get('/', (req: express.Request, res: express.Response) => {
   res.send('hello from lot-tracker.');
 });
 
-app.get('LOGIN_PATH', (req: express.Request, res: express.Response) => {
+app.get(LOGIN_PATH, (req: express.Request, res: express.Response) => {
   res.render('login.html', {oauth_redirect_url: process.env.OAUTH_REDIRECT});
 });
 
