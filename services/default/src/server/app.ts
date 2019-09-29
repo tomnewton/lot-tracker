@@ -8,9 +8,47 @@ import {OAuth2Client} from 'google-auth-library';
 import {GetTokenResponse} from 'google-auth-library/build/src/auth/oauth2client';
 import {LoginTicket} from 'google-auth-library/build/src/auth/loginticket';
 import {upsertUser, User} from './db';
+import session from 'express-session';
+import {Datastore} from '@google-cloud/datastore';
+const DatastoreStore = require('@google-cloud/connect-datastore')(session);
+
+const LOGIN_PATH = '/login';
 
 config();
 export const app = express();
+
+app.use(
+  session({
+    store: new DatastoreStore({
+      dataset: new Datastore({
+        namespace: 'express-sessions',
+        projectId: process.env.GOOGLE_CLOUD_PROJECT,
+        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+      }),
+    }),
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV == 'production' ? true : false,
+    },
+    resave: false,
+  }),
+);
+
+app.use(function(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) {
+  console.log(req.path);
+  if (!req.session.user && req.path !== 'LOGIN_PATH') {
+    res.redirect('LOGIN_PATH');
+    res.end();
+    return;
+  }
+
+  next();
+});
 
 app.engine('html', mustacheExpress());
 app.set('view engine', 'html');
@@ -26,7 +64,7 @@ app.get('/', (req: express.Request, res: express.Response) => {
   res.send('hello from lot-tracker.');
 });
 
-app.get('/login', (req: express.Request, res: express.Response) => {
+app.get('LOGIN_PATH', (req: express.Request, res: express.Response) => {
   res.render('login.html', {oauth_redirect_url: process.env.OAUTH_REDIRECT});
 });
 
