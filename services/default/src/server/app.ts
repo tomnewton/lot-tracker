@@ -10,6 +10,7 @@ import {LoginTicket} from 'google-auth-library/build/src/auth/loginticket';
 import {upsertUser, User} from './db';
 import session from 'express-session';
 import {Datastore} from '@google-cloud/datastore';
+import {runInNewContext} from 'vm';
 const DatastoreStore = require('@google-cloud/connect-datastore')(session);
 
 const LOGIN_PATH = '/login';
@@ -27,7 +28,7 @@ app.use(
       }),
     }),
     secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       secure: process.env.NODE_ENV == 'production' ? true : false,
     },
@@ -41,14 +42,16 @@ app.use(function(
   next: express.NextFunction,
 ) {
   console.log(req.path);
+  console.log(process.env.NODE_ENV);
 
   // allow access to /login page.
-  if (req.path !== LOGIN_PATH) {
+  if (req.path === LOGIN_PATH || req.path === '/authcode') {
     return next();
   }
 
   // not logged in
   if (!req.session.user) {
+    console.log('User not logged in.');
     res.redirect(LOGIN_PATH);
     res.end();
     return;
@@ -80,8 +83,25 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
   console.log('/authcode');
   const body = await getRawBody(req);
   const code = body.toString();
-  const user = await verify(code);
+  let user;
+  try {
+    user = await verify(code);
+  } catch (e) {
+    req.session.user = null;
+    console.log(e.message);
+    res.redirect(LOGIN_PATH);
+    res.end();
+    return;
+  }
+
   // create a session
+  req.session.user = {
+    email: user.email,
+  };
+
+  // logged in, go to homepage.
+  res.redirect('/');
+  res.end();
 });
 
 const client = new OAuth2Client(
