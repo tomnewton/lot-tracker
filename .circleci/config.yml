@@ -47,8 +47,9 @@ aliases:
       command: |
         yarn config set workspaces-experimental true
         yarn install --frozen-lockfile --production
-        cd services/default && yarn add typescript
-        cd services/default && yarn remove @types/google-cloud__tasks
+        cd services/default
+        yarn add typescript
+        yarn remove @types/google-cloud__tasks
 
   - &run-tests
     run: 
