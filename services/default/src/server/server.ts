@@ -19,6 +19,8 @@ process.env.GOOGLE_CLIENT_ID =
 process.env.LOCATION = 'us-central1';
 process.env.DEFAULT_QUEUE = 'default';
 
+console.log(process.env.COOKIE_DOMAIN);
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
