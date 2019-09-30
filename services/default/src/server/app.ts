@@ -94,10 +94,10 @@ app.get(LOGIN_PATH, (req: express.Request, res: express.Response) => {
 });
 
 app.post('/authcode', async (req: express.Request, res: express.Response) => {
-  console.log('/authcode');
   const body = await getRawBody(req);
   const code = body.toString();
-  let user;
+  let user: User;
+
   try {
     user = await verify(code);
   } catch (e) {
