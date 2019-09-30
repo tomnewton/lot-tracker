@@ -121,7 +121,7 @@ async function verify(code: string): Promise<User> {
   const response: GetTokenResponse = await client.getToken({
     code: code,
     client_id: process.env.GOOGLE_CLIENT_ID,
-    redirect_uri: 'http://localhost:8080',
+    redirect_uri: process.env.OAUTH_REDIRECT,
   });
 
   const loginTicket: LoginTicket = await client.verifyIdToken({
