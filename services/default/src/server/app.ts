@@ -113,7 +113,11 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
   req.session.save(function(err: any) {
     if (err != null) {
       console.error(err.message);
-      res.end();
+      res
+        .status(500)
+        .send('Something went wrong.')
+        .end();
+      return;
     }
     // logged in, go to homepage.
     res.redirect('/');
