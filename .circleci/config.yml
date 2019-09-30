@@ -46,7 +46,7 @@ aliases:
       name: yarn init
       command: |
         yarn config set workspaces-experimental true
-        yarn install --frozen-lockfile
+        yarn install --frozen-lockfile --production
 
   - &run-tests
     run: 
