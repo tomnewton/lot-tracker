@@ -22,10 +22,10 @@
             "request": "launch",
             "name": "Launch Program",
             "program": "${workspaceFolder}/services/default/src/server/server.ts",
-            "preLaunchTask": "tsc: build - tsconfig.json",
+            "preLaunchTask": "build",
             "outFiles": [
                 "${workspaceFolder}/services/default/dist/*.js"
             ]
-        }
+        },
     ]
 }
