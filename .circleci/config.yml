@@ -27,6 +27,8 @@ aliases:
         gcloud auth configure-docker --quiet
         gcloud info
         sed -i "s/REPLACE_SHOPIFY_SECRET/$SHOPIFY_SECRET_PRODUCTION/g" services/default/app.yaml
+        sed -i "s/REPLACE_GOOGLE_CLIENT_SECRET/$GOOGLE_CLIENT_SECRET/g" services/default/app.yaml
+        sed -i "s/REPLACE_SESSION_SECRET/$SESSION_SECRET/g" services/default/app.yaml
 
   - &generate-and-set-version-env
     run: 
