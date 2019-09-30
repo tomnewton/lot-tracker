@@ -47,7 +47,7 @@ aliases:
       command: |
         yarn config set workspaces-experimental true
         yarn install --frozen-lockfile --production
-        yarn add typescript
+        cd services/default && yarn add typescript
 
   - &run-tests
     run: 
