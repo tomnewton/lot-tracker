@@ -110,18 +110,7 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
     email: user.email,
   };
 
-  req.session.save(function(err: any) {
-    if (err != null) {
-      console.error(err.message);
-      res
-        .status(500)
-        .send('Something went wrong.')
-        .end();
-      return;
-    }
-    // logged in, go to homepage.
-    res.redirect('/');
-  });
+  res.send('ok').end();
 });
 
 const client = new OAuth2Client(
