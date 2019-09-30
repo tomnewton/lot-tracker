@@ -49,6 +49,7 @@
               contentType: 'application/octet-stream; charset=utf-8',
               success: function(result) {
                 // Handle or verify the server response.
+                window.location.assign('/');
               },
               processData: false,
               data: authResult['code']

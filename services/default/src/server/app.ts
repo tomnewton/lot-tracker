@@ -28,11 +28,13 @@ app.use(
       }),
     }),
     secret: process.env.SESSION_SECRET,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    rolling: true,
+    resave: true,
     cookie: {
       secure: process.env.NODE_ENV == 'production' ? true : false,
+      maxAge: 1000 * 60 * 60, // 1 hour
     },
-    resave: false,
   }),
 );
 
@@ -45,7 +47,16 @@ app.use(function(
   console.log(process.env.NODE_ENV);
 
   // allow access to /login page.
-  if (req.path === LOGIN_PATH || req.path === '/authcode') {
+  if (req.path === LOGIN_PATH) {
+    if (req.session.user) {
+      res.redirect('/');
+      res.end();
+      return;
+    }
+    return next();
+  }
+
+  if (req.path === '/authcode') {
     return next();
   }
 
@@ -99,9 +110,14 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
     email: user.email,
   };
 
-  // logged in, go to homepage.
-  res.redirect('/');
-  res.end();
+  req.session.save(function(err: any) {
+    if (err != null) {
+      console.error(err.message);
+      res.end();
+    }
+    // logged in, go to homepage.
+    res.redirect('/');
+  });
 });
 
 const client = new OAuth2Client(
