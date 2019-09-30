@@ -7,8 +7,10 @@ if (
   process.env.NODE_ENV == 'production'
 ) {
   process.env.REDIRECT_URI = 'https://indigo-griffin-254218.appspot.com';
+  process.env.COOKIE_DOMAIN = 'indigo-griffin-254218.appspot.com';
 } else {
   process.env.REDIRECT_URI = 'http://localhost:8080';
+  process.env.COOKIE_DOMAIN = 'localhost:8080';
 }
 
 process.env.OAUTH_REDIRECT = process.env.REDIRECT_URI + '/authcode';

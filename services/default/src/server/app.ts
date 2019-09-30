@@ -33,6 +33,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === 'production' ? true : false,
       maxAge: 1000 * 60 * 60, // 1 hour
+      domain: process.env.COOKIE_DOMAIN,
     },
   }),
 );
