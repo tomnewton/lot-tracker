@@ -3,12 +3,13 @@
     // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
-        {   "label": "tsc: build - tsconfig.json",
-            "type": "typescript",
-            "tsconfig": "services/default/tsconfig.json",
-            "problemMatcher": [
-                "$tsc"
-            ]
+        {
+            "label": "build",
+            "type": "shell",
+            "options": {
+                "cwd": "./services/default"
+            },
+            "command": "yarn build && yarn copy-templates",
         }
     ]
 }

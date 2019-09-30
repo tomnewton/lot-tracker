@@ -54,7 +54,7 @@ aliases:
       command: |
         cd services/default/ && yarn test
 jobs:
-  build:
+  lot-tracker-build:
     <<: *defaults
     steps:
       - checkout
@@ -77,3 +77,13 @@ jobs:
           key: v1-dependencies-{{ checksum "services/default/package.json" }}
       
       - run: cd services/default/ && gcloud app deploy
+
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - lot-tracker-build:
+          filters:
+            branches:
+              only: master
