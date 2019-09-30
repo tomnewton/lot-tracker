@@ -10,7 +10,6 @@ import {LoginTicket} from 'google-auth-library/build/src/auth/loginticket';
 import {upsertUser, User} from './db';
 import session from 'express-session';
 import {Datastore} from '@google-cloud/datastore';
-import {runInNewContext} from 'vm';
 const DatastoreStore = require('@google-cloud/connect-datastore')(session);
 
 const LOGIN_PATH = '/login';
@@ -23,8 +22,8 @@ app.use(
     store: new DatastoreStore({
       dataset: new Datastore({
         namespace: 'express-sessions',
-        projectId: process.env.GOOGLE_CLOUD_PROJECT,
-        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+        projectId: process.env.GOOGLE_CLOUD_PROJECT, // gae supported
+        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // gae supported
       }),
     }),
     secret: process.env.SESSION_SECRET,
