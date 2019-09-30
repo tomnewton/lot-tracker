@@ -31,7 +31,7 @@ app.use(
     rolling: true,
     resave: true,
     cookie: {
-      secure: process.env.NODE_ENV == 'production' ? true : false,
+      secure: process.env.NODE_ENV === 'production' ? true : false,
       maxAge: 1000 * 60 * 60, // 1 hour
     },
   }),
@@ -108,7 +108,8 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
   req.session.user = {
     email: user.email,
   };
-
+  console.log('session saved.');
+  console.log(req.session.user.email);
   res.send('ok').end();
 });
 
