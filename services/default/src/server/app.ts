@@ -16,7 +16,11 @@ const LOGIN_PATH = '/login';
 
 config();
 export const app = express();
+
+// gae ssl termination point means we
+// can't set cookies on the [subdomain].appspot.com
 app.set('trust proxy', 1);
+
 app.use(
   session({
     store: new DatastoreStore({
@@ -62,7 +66,6 @@ app.use(function(
 
   // not logged in
   if (!req.session.user) {
-    console.log('User not logged in.');
     res.redirect(LOGIN_PATH);
     res.end();
     return;
@@ -99,7 +102,7 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
     user = await verify(code);
   } catch (e) {
     req.session.user = null;
-    console.log(e.message);
+    console.error(e.message);
     res.redirect(LOGIN_PATH);
     res.end();
     return;
@@ -109,8 +112,7 @@ app.post('/authcode', async (req: express.Request, res: express.Response) => {
   req.session.user = {
     email: user.email,
   };
-  console.log('session saved.');
-  console.log(req.session.user.email);
+
   res.send('ok').end();
 });
 
@@ -132,8 +134,8 @@ async function verify(code: string): Promise<User> {
   });
 
   const payload = loginTicket.getPayload();
-  if (payload.hd !== 'letsnixit.com') {
-    throw new Error('Only letsnixit.com accounts are authorized.');
+  if (payload.hd !== process.env.NIXIT_DOMAIN) {
+    throw new Error(`${payload.hd} is not authorized.`);
   }
 
   return await upsertUser({

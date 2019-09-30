@@ -18,6 +18,7 @@ process.env.GOOGLE_CLIENT_ID =
   '650681620406-t65g3fb241sqq6tggf0dlqqmkbj6o9eg.apps.googleusercontent.com';
 process.env.LOCATION = 'us-central1';
 process.env.DEFAULT_QUEUE = 'default';
+process.env.NIXIT_DOMAIN = 'letsnixit.com';
 
 console.log(process.env.COOKIE_DOMAIN);
 
