@@ -1,5 +1,4 @@
 import express from 'express';
-import {config} from 'dotenv';
 import {webhooks} from './webhooks';
 import {worker} from './worker';
 import mustacheExpress from 'mustache-express';
@@ -24,8 +23,6 @@ declare global {
   }
 }
 
-config();
-
 export async function startApp(): Promise<express.Application> {
   const {logger, mw} = await lb.express.middleware({
     logName: 'lot-tracker',
@@ -35,12 +32,15 @@ export async function startApp(): Promise<express.Application> {
 
   app.use(mw);
 
-  // gae ssl termination point means we
-  // can't set cookies on the [subdomain].appspot.com
-  app.set('trust proxy', 1);
+  if (process.env.NODE_ENV === 'production') {
+    // gae ssl termination point means we
+    // can't set cookies on the [subdomain].appspot.com
+    app.set('trust proxy', 1);
+  }
+
   app.engine('html', mustacheExpress());
   app.set('view engine', 'html');
-  app.set('views', __dirname + '/client/');
+  app.set('views', __dirname + '/server/views');
 
   //webhooks handled by the webhooks router.
   app.use('/webhooks', webhooks);
@@ -48,6 +48,7 @@ export async function startApp(): Promise<express.Application> {
   //processing the queue.
   app.use('/process', worker);
 
+  //auth setup.
   app.use(
     session({
       store: new DatastoreStore({
