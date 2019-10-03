@@ -1,4 +1,4 @@
-import {app} from './app';
+import {startApp} from './app';
 
 const PORT = process.env.PORT || 8080;
 
@@ -22,6 +22,11 @@ process.env.NIXIT_DOMAIN = 'letsnixit.com';
 
 console.log(process.env.COOKIE_DOMAIN);
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}...`);
-});
+async function start() {
+  const app = await startApp();
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}...`);
+  });
+}
+
+start();
