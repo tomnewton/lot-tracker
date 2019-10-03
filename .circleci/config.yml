@@ -53,7 +53,6 @@ aliases:
         yarn add typescript
         GOOG_TASK_INSTALLED="$(yarn list --pattern types/google | grep types/google-cloud__tasks | wc -l |  tr -d '[:space:]')"
         if [ $GOOG_TASK_INSTALLED -eq 1 ] then yarn remove @types/google-cloud__tasks fi
-        yarn remove @types/google-cloud__tasks
 
   - &run-tests
     run: 
