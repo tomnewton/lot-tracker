@@ -20,6 +20,15 @@ export const app = express();
 // gae ssl termination point means we
 // can't set cookies on the [subdomain].appspot.com
 app.set('trust proxy', 1);
+app.engine('html', mustacheExpress());
+app.set('view engine', 'html');
+app.set('views', __dirname + '/client/');
+
+//webhooks handled by the webhooks router.
+app.use('/webhooks', webhooks);
+
+//processing the queue.
+app.use('/process', worker);
 
 app.use(
   session({
@@ -74,16 +83,6 @@ app.use(function(
   // logged in
   next();
 });
-
-app.engine('html', mustacheExpress());
-app.set('view engine', 'html');
-app.set('views', __dirname + '/client/');
-
-//webhooks handled by the webhooks router.
-app.use('/webhooks', webhooks);
-
-//processing the queue.
-app.use('/process', worker);
 
 app.get('/', (req: express.Request, res: express.Response) => {
   res.send('hello from lot-tracker.');
