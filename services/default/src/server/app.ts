@@ -10,110 +10,131 @@ import {LoginTicket} from 'google-auth-library/build/src/auth/loginticket';
 import {upsertUser, User} from './db';
 import session from 'express-session';
 import {Datastore} from '@google-cloud/datastore';
+const lb = require('@google-cloud/logging-bunyan');
+import {Logger} from '@google-cloud/logging-bunyan/build/src/middleware/express';
 const DatastoreStore = require('@google-cloud/connect-datastore')(session);
 
 const LOGIN_PATH = '/login';
 
+declare global {
+  namespace Express {
+    interface Request {
+      log?: Logger;
+    }
+  }
+}
+
 config();
-export const app = express();
 
-// gae ssl termination point means we
-// can't set cookies on the [subdomain].appspot.com
-app.set('trust proxy', 1);
-app.engine('html', mustacheExpress());
-app.set('view engine', 'html');
-app.set('views', __dirname + '/client/');
+export async function startApp(): Promise<express.Application> {
+  const {logger, mw} = await lb.express.middleware({
+    logName: 'lot-tracker',
+  });
 
-//webhooks handled by the webhooks router.
-app.use('/webhooks', webhooks);
+  const app = express();
 
-//processing the queue.
-app.use('/process', worker);
+  app.use(mw);
 
-app.use(
-  session({
-    store: new DatastoreStore({
-      dataset: new Datastore({
-        namespace: 'express-sessions',
-        projectId: process.env.GOOGLE_CLOUD_PROJECT, // gae supported
-        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // gae supported
+  // gae ssl termination point means we
+  // can't set cookies on the [subdomain].appspot.com
+  app.set('trust proxy', 1);
+  app.engine('html', mustacheExpress());
+  app.set('view engine', 'html');
+  app.set('views', __dirname + '/client/');
+
+  //webhooks handled by the webhooks router.
+  app.use('/webhooks', webhooks);
+
+  //processing the queue.
+  app.use('/process', worker);
+
+  app.use(
+    session({
+      store: new DatastoreStore({
+        dataset: new Datastore({
+          namespace: 'express-sessions',
+          projectId: process.env.GOOGLE_CLOUD_PROJECT, // gae supported
+          keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // gae supported
+        }),
       }),
+      secret: process.env.SESSION_SECRET,
+      saveUninitialized: false,
+      rolling: true,
+      resave: true,
+      cookie: {
+        secure: process.env.NODE_ENV === 'production' ? true : false,
+        maxAge: 1000 * 60 * 60, // 1 hour
+        domain: process.env.COOKIE_DOMAIN,
+      },
     }),
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
-    rolling: true,
-    resave: true,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production' ? true : false,
-      maxAge: 1000 * 60 * 60, // 1 hour
-      domain: process.env.COOKIE_DOMAIN,
-    },
-  }),
-);
+  );
 
-app.use(function(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction,
-) {
-  console.log(req.path);
-  console.log(process.env.NODE_ENV);
+  app.use(function(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) {
+    req.log.info(req.path);
+    req.log.info(process.env.NODE_ENV);
 
-  // allow access to /login page.
-  if (req.path === LOGIN_PATH) {
-    if (req.session.user) {
-      res.redirect('/');
+    // allow access to /login page.
+    if (req.path === LOGIN_PATH) {
+      if (req.session.user) {
+        res.redirect('/');
+        res.end();
+        return;
+      }
+      return next();
+    }
+
+    if (req.path === '/authcode') {
+      return next();
+    }
+
+    // not logged in
+    if (!req.session.user) {
+      res.redirect(LOGIN_PATH);
       res.end();
       return;
     }
-    return next();
-  }
 
-  if (req.path === '/authcode') {
-    return next();
-  }
+    // logged in
+    next();
+  });
 
-  // not logged in
-  if (!req.session.user) {
-    res.redirect(LOGIN_PATH);
-    res.end();
-    return;
-  }
+  app.get('/', (req: express.Request, res: express.Response) => {
+    res.send('hello from lot-tracker.');
+  });
 
-  // logged in
-  next();
-});
+  app.get(LOGIN_PATH, (req: express.Request, res: express.Response) => {
+    res.render('login.html', {oauth_redirect_url: process.env.OAUTH_REDIRECT});
+  });
 
-app.get('/', (req: express.Request, res: express.Response) => {
-  res.send('hello from lot-tracker.');
-});
+  app.post('/authcode', async (req: express.Request, res: express.Response) => {
+    const body = await getRawBody(req);
+    const code = body.toString();
+    let user: User;
 
-app.get(LOGIN_PATH, (req: express.Request, res: express.Response) => {
-  res.render('login.html', {oauth_redirect_url: process.env.OAUTH_REDIRECT});
-});
+    try {
+      user = await verify(code);
+    } catch (e) {
+      req.session.user = null;
+      req.log.error(e.message);
+      res.redirect(LOGIN_PATH);
+      res.end();
+      return;
+    }
 
-app.post('/authcode', async (req: express.Request, res: express.Response) => {
-  const body = await getRawBody(req);
-  const code = body.toString();
-  let user: User;
+    // create a session
+    req.session.user = {
+      email: user.email,
+    };
 
-  try {
-    user = await verify(code);
-  } catch (e) {
-    req.session.user = null;
-    console.error(e.message);
-    res.redirect(LOGIN_PATH);
-    res.end();
-    return;
-  }
+    res.send('ok').end();
+  });
 
-  // create a session
-  req.session.user = {
-    email: user.email,
-  };
-
-  res.send('ok').end();
-});
+  return app;
+}
 
 const client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
