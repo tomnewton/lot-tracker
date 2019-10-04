@@ -9,7 +9,7 @@
             "options": {
                 "cwd": "./services/default"
             },
-            "command": "yarn build && yarn copy-templates",
+            "command": "yarn build && yarn copy-templates && yarn copy-dot-env",
         }
     ]
 }
