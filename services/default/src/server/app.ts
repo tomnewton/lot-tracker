@@ -9,6 +9,7 @@ import {LoginTicket} from 'google-auth-library/build/src/auth/loginticket';
 import {upsertUser, User} from './db';
 import session from 'express-session';
 import {Datastore} from '@google-cloud/datastore';
+import path from 'path';
 const lb = require('@google-cloud/logging-bunyan');
 import {Logger} from '@google-cloud/logging-bunyan/build/src/middleware/express';
 const DatastoreStore = require('@google-cloud/connect-datastore')(session);
@@ -40,7 +41,7 @@ export async function startApp(): Promise<express.Application> {
 
   app.engine('html', mustacheExpress());
   app.set('view engine', 'html');
-  app.set('views', __dirname + '/server/views');
+  app.set('views', __dirname + '/views');
 
   //webhooks handled by the webhooks router.
   app.use('/webhooks', webhooks);
@@ -103,10 +104,6 @@ export async function startApp(): Promise<express.Application> {
     next();
   });
 
-  app.get('/', (req: express.Request, res: express.Response) => {
-    res.send('hello from lot-tracker.');
-  });
-
   app.get(LOGIN_PATH, (req: express.Request, res: express.Response) => {
     res.render('login.html', {oauth_redirect_url: process.env.OAUTH_REDIRECT});
   });
@@ -131,18 +128,26 @@ export async function startApp(): Promise<express.Application> {
       email: user.email,
     };
 
-    res.send('ok').end();
+    req.session.save(function(err: any) {
+      res.send('ok').end();
+    });
+  });
+
+  app.use(express.static(path.join(__dirname, 'dist/client')));
+
+  app.get('/', (req: express.Request, res: express.Response) => {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
   });
 
   return app;
 }
 
-const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-);
-
 async function verify(code: string): Promise<User> {
+  let client: OAuth2Client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+  );
+
   const response: GetTokenResponse = await client.getToken({
     code: code,
     client_id: process.env.GOOGLE_CLIENT_ID,
