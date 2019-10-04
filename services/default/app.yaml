@@ -3,7 +3,7 @@ instance_class: F1
 
 handlers:
 - url: /static
-  static_dir: dist/static
+  static_dir: dist/client/static
 
 - url: /.*
   secure: always
