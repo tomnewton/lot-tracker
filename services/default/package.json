@@ -3,13 +3,13 @@
     "version": "1.0.0",
     "license": "UNLICENSED",
     "scripts": {
-        "build": "./node_modules/.bin/tsc",
-        "start-dev": "rm -rf ./dist && yarn build && yarn copy-templates && yarn copy-dot-env && yarn start",
+        "build": "rm -rf ./dist/server && ./node_modules/.bin/tsc && yarn copy-templates && yarn copy-dot-env && rm -rf ./dist/client",
+        "start-dev": "rm -rf ./dist/server && yarn build && yarn start",
         "start": "node ./dist/server/server.js",
         "test": "./node_modules/.bin/jest --rootDir=./src",
         "copy-templates": "copyfiles -u 1 src/**/*.html ./dist",
         "copy-dot-env": "copyfiles -u 1 ../../.env ./dist",
-        "release-build": "./node_modules/.bin/tsc && yarn copy-templates && rm -rf ./dist/client"
+        "release-build": "./node_modules/.bin/tsc && yarn copy-templates && yarn copy-dot-env && rm -rf ./dist/client"
     },
     "prettier": {
         "printWidth": 80,
