@@ -9,7 +9,7 @@
         "test": "./node_modules/.bin/jest --rootDir=./src",
         "copy-templates": "copyfiles -u 1 src/**/*.html ./dist",
         "copy-dot-env": "copyfiles -u 1 ../../.env ./dist",
-        "release-build": "./node_modules/.bin/tsc && yarn copy-templates && cd client && ./yarn build"
+        "release-build": "./node_modules/.bin/tsc && yarn copy-templates && rm -rf ./dist/client"
     },
     "prettier": {
         "printWidth": 80,

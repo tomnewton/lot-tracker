@@ -74,6 +74,7 @@ jobs:
 
       - *yarn-init
       - run: cd services/default/ && yarn release-build
+      - run: cd services/default/src/client && yarn build
       - *run-tests
     
       - save_cache:
