@@ -3,11 +3,11 @@ instance_class: F1
 
 handlers:
 - url: /manifest\.json
-  static_files: manifest.json
+  static_files: dist/client/build/manifest.json
   upload: dist/client/build/manifest\.json
 
 - url: /favicon\.ico
-  static_files: favicon.ico
+  static_files: dist/client/build/favicon.ico
   upload: dist/client/build/favicon\.ico
 
 - url: /static
