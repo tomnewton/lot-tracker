@@ -17,25 +17,24 @@ interface AccountProps {
 }
 
 export default function App() {
-  const [newsletter, setNewsletter] = useState(false);
   const [email, setEmail] = useState('');
   const [currentLot, setCurrentLot] = useState('3232432');
 
-  const handleSubmit = useCallback((_event) => {
+  const handleSubmit = useCallback((event) => {
     setEmail('');
-    setNewsletter(false);
+    setCurrentLot(event);
   }, []);
 
-  const handleNewsLetterChange = useCallback(
-    (value) => setNewsletter(value),
+  /*const handleNewsLetterChange = useCallback(
+    (value) => setCurrentLot(value),
     [],
-  );
+  );*/
 
 
   const handleEmailChange = useCallback((value) => setEmail(value), []);
-  const [active, setActive] = useState(false);
+  //const [active, setActive] = useState(false);
 
-  const handleChange = useCallback(() => setActive(!active), [active]);
+  //const handleChange = useCallback(() => setActive(!active), [active]);
 
   
   return (
