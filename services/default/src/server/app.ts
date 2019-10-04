@@ -60,7 +60,7 @@ export async function startApp(): Promise<express.Application> {
         }),
       }),
       secret: process.env.SESSION_SECRET,
-      saveUninitialized: false,
+      saveUninitialized: true,
       rolling: true,
       resave: true,
       cookie: {
@@ -133,10 +133,10 @@ export async function startApp(): Promise<express.Application> {
     });
   });
 
-  app.use(express.static(path.join(__dirname, 'dist/client')));
+  app.use(express.static(path.join(__dirname, 'dist/client/build')));
 
   app.get('/', (req: express.Request, res: express.Response) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'dist/client/build', 'index.html'));
   });
 
   return app;
