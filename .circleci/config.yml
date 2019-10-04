@@ -83,6 +83,7 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "services/default/package.json" }}
       
+      - run: rm -rf node_modules && rm -rf src
       - run: cd services/default/ && gcloud app deploy
 
 
