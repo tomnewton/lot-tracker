@@ -74,6 +74,7 @@ jobs:
 
       - *yarn-init
       - run: cd services/default/ && yarn release-build
+      - run: yarn global add create-react-app
       - run: cd services/default/src/client && yarn build
       - *run-tests
     
