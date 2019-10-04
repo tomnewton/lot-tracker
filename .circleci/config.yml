@@ -73,7 +73,7 @@ jobs:
             - v1-dependencies-
 
       - *yarn-init
-      - run: cd services/default/ && yarn build && yarn copy-templates
+      - run: cd services/default/ && yarn release-build
       - *run-tests
     
       - save_cache:
