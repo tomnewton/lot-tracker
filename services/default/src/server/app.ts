@@ -1,5 +1,6 @@
 import express from 'express';
 import {webhooks} from './webhooks';
+import {api} from './api';
 import {worker} from './worker';
 import mustacheExpress from 'mustache-express';
 import getRawBody from 'raw-body';
@@ -103,6 +104,8 @@ export async function startApp(): Promise<express.Application> {
     // logged in
     next();
   });
+
+  app.use('/api', api);
 
   app.get(LOGIN_PATH, (req: express.Request, res: express.Response) => {
     res.render('login.html', {oauth_redirect_url: process.env.OAUTH_REDIRECT});
