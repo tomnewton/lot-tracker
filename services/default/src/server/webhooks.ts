@@ -12,6 +12,7 @@ const asyncMiddleware = (fn: any) => (
 };
 
 export let webhooks = Router();
+webhooks.use(asyncMiddleware(readBody));
 webhooks.use(asyncMiddleware(verify));
 
 webhooks.post(
@@ -23,15 +24,20 @@ webhooks.post(
   }),
 );
 
+// middleware to prep the request body.
+async function readBody(req: Request, res: Response, next: NextFunction) {
+  const payload = await getRawBody(req);
+  req.body = payload.toString();
+  next();
+}
+
 // Verify incoming webhooks.
 async function verify(req: Request, res: Response, next: NextFunction) {
   const hmac = req.get('X-Shopify-Hmac-Sha256');
-  const payload = await getRawBody(req);
-  const message = payload.toString();
-  req.body = message;
+
   const genHash = crypto
     .createHmac('sha256', process.env.SHOPIFY_SECRET)
-    .update(message)
+    .update(req.body)
     .digest('base64');
 
   if (genHash != hmac) {

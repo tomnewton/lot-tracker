@@ -49,7 +49,7 @@ const RootQueryType = new GraphQLObjectType({
     hello: {
       type: GraphQLString,
       resolve() {
-        return 'hello world2';
+        return 'hello world';
       },
     },
     fulfillmentServices: {
