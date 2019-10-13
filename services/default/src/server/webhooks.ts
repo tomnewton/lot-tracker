@@ -13,7 +13,10 @@ const asyncMiddleware = (fn: any) => (
 
 export let webhooks = Router();
 webhooks.use(asyncMiddleware(readBody));
-webhooks.use(asyncMiddleware(verify));
+
+if (process.env.NODE_ENV !== 'test') {
+  webhooks.use(asyncMiddleware(verify));
+}
 
 webhooks.post(
   '/orders/fulfilled',

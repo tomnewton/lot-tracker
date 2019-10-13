@@ -1,4 +1,5 @@
 import express from 'express';
+import {setupENV} from './env';
 import {webhooks} from './webhooks';
 import {api} from './api';
 import {worker} from './worker';
@@ -17,6 +18,7 @@ const DatastoreStore = require('@google-cloud/connect-datastore')(session);
 
 const LOGIN_PATH = '/login';
 
+setupENV();
 declare global {
   namespace Express {
     interface Request {
