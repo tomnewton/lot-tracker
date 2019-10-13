@@ -4,18 +4,70 @@ import {
   GraphQLString,
   GraphQLList,
   GraphQLSchema,
+  GraphQLResolveInfo,
 } from 'graphql';
+import {
+  globalIdField,
+  fromGlobalId,
+  nodeDefinitions,
+  connectionDefinitions,
+  connectionArgs,
+  connectionFromArray,
+  connectionFromPromisedArray,
+  GraphQLNodeDefinitions,
+} from 'graphql-relay';
 import graphqlHTTP, {GraphQLParams} from 'express-graphql';
 import {Router, NextFunction, Response, Request} from 'express';
-import {getUser, getFulfillmentServices, getLocations} from './db';
+import {
+  getUser,
+  getFulfillmentServices,
+  getLocations,
+  FulfillmentService,
+  Location,
+  getURLSafeKey,
+  getEntityKey,
+  get,
+} from './db';
+import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
+
+var {nodeInterface, nodeField} = nodeDefinitions(
+  async (globalId) => {
+    var {type, id} = fromGlobalId(globalId);
+    // Log to NodeJS console the mapping from globalId/Node ID
+    // to actual object type and id
+
+    const key: entity.Key = new entity.URLSafeKey().legacyDecode(id);
+
+    // onsole.log('NodeDefinitions (globalId), id:', id);
+    // console.log('NodeDefinitions (globalId), type:', type);
+
+    return await get(key);
+  },
+  (obj: Entity) => {
+    switch (getEntityKey(obj).kind) {
+      case LocationType.name:
+        return LocationType;
+      case FulfillmentServiceType.name:
+        return FulfillmentServiceType;
+      default:
+        return null;
+    }
+  },
+);
 
 const LocationType = new GraphQLObjectType({
   name: 'Location',
   fields: {
-    ID: {
+    id: globalIdField(
+      'Location',
+      (object: Location, context: any, info: GraphQLResolveInfo) => {
+        return getURLSafeKey(object);
+      },
+    ),
+    locationId: {
       type: GraphQLInt,
       resolve: (source, context, args) => {
-        return source.ID;
+        return source.locationId;
       },
     },
     currentLot: {
@@ -25,6 +77,11 @@ const LocationType = new GraphQLObjectType({
       },
     },
   },
+  interfaces: [nodeInterface],
+});
+
+var {connectionType: LocationConnection} = connectionDefinitions({
+  nodeType: LocationType,
 });
 
 const FulfillmentServiceType = new GraphQLObjectType({
@@ -32,33 +89,44 @@ const FulfillmentServiceType = new GraphQLObjectType({
   description:
     'A Fullfilment Service is a unique fulfillment service, like SFN.',
   fields: {
+    id: globalIdField(
+      'FulfillmentService',
+      (object: FulfillmentService, context: any, info: GraphQLResolveInfo) => {
+        return getURLSafeKey(object);
+      },
+    ),
     name: {type: GraphQLString},
     locations: {
-      name: 'LocationType',
-      type: GraphQLList(LocationType),
-      resolve: async (source, context, args) => {
-        return getLocations(source);
-      },
+      type: LocationConnection,
+      args: connectionArgs,
+      resolve: (fulfillmentService: FulfillmentService, args) =>
+        connectionFromPromisedArray(getLocations(fulfillmentService), args),
     },
   },
+  interfaces: [nodeInterface],
+});
+
+var {connectionType: FulfillmentServiceConnection} = connectionDefinitions({
+  nodeType: FulfillmentServiceType,
 });
 
 const RootQueryType = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    hello: {
-      type: GraphQLString,
-      resolve() {
-        return 'hello world';
-      },
-    },
+    node: nodeField,
+    // fulfillmentServices: {
+    //   name: 'FulfillmentServiceType',
+    //   description: 'Query root for Fulfillment Services.',
+    //   type: GraphQLList(FulfillmentServiceType),
+    //   resolve: async (source, context, args) => {
+    //     return await getFulfillmentServices();
+    //   },
+    // },
     fulfillmentServices: {
-      name: 'FulfillmentServiceType',
-      description: 'Query root for Fulfillment Services.',
-      type: GraphQLList(FulfillmentServiceType),
-      resolve: async (source, context, args) => {
-        return await getFulfillmentServices();
-      },
+      type: FulfillmentServiceConnection,
+      args: connectionArgs,
+      resolve: (none: object, args) =>
+        connectionFromPromisedArray(getFulfillmentServices(), args),
     },
   },
 });

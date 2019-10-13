@@ -1,5 +1,9 @@
 import {Datastore, Query} from '@google-cloud/datastore';
-import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
+import {
+  entity,
+  Entity,
+  KeyProto,
+} from '@google-cloud/datastore/build/src/entity';
 
 // Creates a client
 const datastore = new Datastore();
@@ -19,7 +23,7 @@ export interface FulfillmentService {
 }
 
 export interface Location {
-  ID: number;
+  locationId: number;
   currentLot: string;
 }
 
@@ -35,16 +39,27 @@ export async function getFulfillmentServices(): Promise<FulfillmentService[]> {
   return result[0];
 }
 
-export async function getLocations(
-  fulfillmentService: Object,
-): Promise<Location[]> {
-  var syms = Object.getOwnPropertySymbols(fulfillmentService);
-  var mFound = syms.find((e) => e.toString() === 'Symbol(KEY)');
-  var id = fulfillmentService[mFound].id;
+export function getURLSafeKey(object: Entity): string {
+  //const val: entity.Key = object[entity.KEY_SYMBOL];
+  //return JSON.stringify(val.serialized);
+  //const val: KeyProto = entity.keyToKeyProto(object[entity.KEY_SYMBOL]);
+  const urlsafe: entity.URLSafeKey = new entity.URLSafeKey();
+  return urlsafe.legacyEncode(
+    process.env.GOOGLE_CLOUD_PROJECT,
+    object[entity.KEY_SYMBOL],
+  );
+}
 
+export function getEntityKey(object: Entity): entity.Key {
+  return object[entity.KEY_SYMBOL];
+}
+
+export async function getLocations(
+  fulfillmentService: Entity,
+): Promise<Location[]> {
   const query: Query = datastore
     .createQuery(KIND_LOCATION)
-    .hasAncestor(datastore.key([KIND_FULFILLMENT_SERVICE, parseInt(id)]));
+    .hasAncestor(getEntityKey(fulfillmentService));
 
   const result: any = await datastore.runQuery(query);
   return result[0];
@@ -79,4 +94,9 @@ export async function upsertUser(user: User): Promise<User> {
 export async function getUser(email: string): Promise<User> {
   const user: Entity = await datastore.get(datastore.key([KIND_USER, email]));
   return user[0];
+}
+
+export async function get(key: entity.Key): Promise<Entity> {
+  const result: Entity = await datastore.get(key);
+  return result[0];
 }
