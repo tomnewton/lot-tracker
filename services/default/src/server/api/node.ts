@@ -3,6 +3,7 @@ import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
 import {getEntityKey, get} from '../db';
 import {FulfillmentServiceType} from './fulfillment_service';
 import {LocationType} from './location';
+import {GraphQLObjectType} from 'graphql';
 
 export const {nodeInterface, nodeField} = nodeDefinitions(
   async (globalId) => {
@@ -17,7 +18,7 @@ export const {nodeInterface, nodeField} = nodeDefinitions(
 
     return await get(key);
   },
-  (obj: Entity) => {
+  (obj: Entity): GraphQLObjectType => {
     const kind = getEntityKey(obj).kind;
     switch (kind) {
       case FulfillmentServiceType.name:

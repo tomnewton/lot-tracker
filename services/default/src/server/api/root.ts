@@ -1,13 +1,26 @@
 import {GraphQLObjectType} from 'graphql';
 import {connectionArgs, connectionFromPromisedArray} from 'graphql-relay';
 import {getFulfillmentServices} from '../db';
-import {FulfillmentServiceConnection} from './fulfillment_service';
+import {
+  FulfillmentServiceConnection,
+  FulfillmentServiceType,
+} from './fulfillment_service';
+import {LocationType} from './location';
 import {nodeField} from './node';
 
 export const RootQueryType = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    node: nodeField, // so we can use eg. query { node(id: ID!) { ... on FulfillmentService {name}}}
+    fulfillmentService: {
+      type: FulfillmentServiceType,
+      resolve: nodeField.resolve,
+      args: nodeField.args,
+    },
+    location: {
+      type: LocationType,
+      resolve: nodeField.resolve,
+      args: nodeField.args,
+    },
     fulfillmentServices: {
       type: FulfillmentServiceConnection,
       args: connectionArgs,
