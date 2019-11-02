@@ -4,6 +4,8 @@ import {
   Entity,
   KeyProto,
 } from '@google-cloud/datastore/build/src/entity';
+import {ConnectionArguments} from 'graphql-relay';
+import {Request} from 'express';
 
 // Creates a client
 const datastore = new Datastore();
@@ -31,9 +33,14 @@ const KIND_FULFILLMENT_SERVICE = 'FulfillmentService';
 const KIND_USER = 'User';
 const KIND_LOCATION = 'Location';
 
-export async function getFulfillmentServices(): Promise<FulfillmentService[]> {
+export async function getFulfillmentServices(
+  args: ConnectionArguments,
+): Promise<FulfillmentService[]> {
   const query = datastore.createQuery(KIND_FULFILLMENT_SERVICE);
-  query.limit(10);
+
+  if (args.first) {
+    query.limit(args.first);
+  }
 
   const result = await datastore.runQuery(query);
   return result[0];
