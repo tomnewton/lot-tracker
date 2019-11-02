@@ -1,8 +1,7 @@
-import {connectionArgs, connectionFromPromisedArray} from 'graphql-relay';
-import {FulfillmentServiceConnection} from './fulfillment_service';
-import {getFulfillmentServices} from '../db';
 import {GraphQLObjectType} from 'graphql';
-
+import {connectionArgs, connectionFromPromisedArray} from 'graphql-relay';
+import {getFulfillmentServices} from '../db';
+import {FulfillmentServiceConnection} from './fulfillment_service';
 import {nodeField} from './node';
 
 export const RootQueryType = new GraphQLObjectType({
