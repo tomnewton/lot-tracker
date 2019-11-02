@@ -7,15 +7,8 @@ import {GraphQLObjectType} from 'graphql';
 
 export const {nodeInterface, nodeField} = nodeDefinitions(
   async (globalId) => {
-    var {type, id} = fromGlobalId(globalId);
-    // Log to NodeJS console the mapping from globalId/Node ID
-    // to actual object type and id
-
-    const key: entity.Key = new entity.URLSafeKey().legacyDecode(id);
-
-    // onsole.log('NodeDefinitions (globalId), id:', id);
-    // console.log('NodeDefinitions (globalId), type:', type);
-
+    var resolved = fromGlobalId(globalId);
+    const key: entity.Key = new entity.URLSafeKey().legacyDecode(resolved.id);
     return await get(key);
   },
   (obj: Entity): GraphQLObjectType => {
