@@ -1,11 +1,11 @@
 import {
+  GraphQLInt,
   GraphQLObjectType,
   GraphQLResolveInfo,
-  GraphQLInt,
   GraphQLString,
 } from 'graphql';
-import {globalIdField, connectionDefinitions} from 'graphql-relay';
-import {getURLSafeKey, getEntityKey, get} from '../db';
+import {connectionDefinitions, globalIdField} from 'graphql-relay';
+import {getURLSafeKey} from '../db';
 import {nodeInterface} from './node';
 
 export const LocationType = new GraphQLObjectType({

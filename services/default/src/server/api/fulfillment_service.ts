@@ -1,16 +1,11 @@
 import {GraphQLObjectType, GraphQLResolveInfo, GraphQLString} from 'graphql';
 import {
-  globalIdField,
   connectionArgs,
-  connectionFromPromisedArray,
   connectionDefinitions,
+  connectionFromPromisedArray,
+  globalIdField,
 } from 'graphql-relay';
-import {
-  FulfillmentService,
-  getURLSafeKey,
-  getLocations,
-  getFulfillmentServices,
-} from './../db';
+import {FulfillmentService, getLocations, getURLSafeKey} from './../db';
 import {LocationConnection} from './location';
 import {nodeInterface} from './node';
 
