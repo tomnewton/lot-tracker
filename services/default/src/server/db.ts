@@ -15,7 +15,6 @@ export interface User {
 }
 
 export interface FulfillmentService {
-  _id: number;
   name: string;
 }
 
@@ -27,6 +26,21 @@ export interface Location {
 const KIND_FULFILLMENT_SERVICE = 'FulfillmentService';
 const KIND_USER = 'User';
 const KIND_LOCATION = 'Location';
+
+export async function newFulfillmentService(
+  name: string,
+): Promise<FulfillmentService> {
+  const kind = KIND_FULFILLMENT_SERVICE;
+  const fulfillmentServiceKey = datastore.key([kind, name]);
+  const fulfillmentService = {
+    key: fulfillmentServiceKey,
+    data: {
+      name: name,
+    },
+  };
+  await datastore.save(fulfillmentService);
+  return await get(fulfillmentServiceKey);
+}
 
 export async function getFulfillmentServices(
   args: ConnectionArguments,

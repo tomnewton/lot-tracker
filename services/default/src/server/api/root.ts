@@ -1,4 +1,4 @@
-import {GraphQLObjectType} from 'graphql';
+import {GraphQLObjectType, GraphQLNonNull} from 'graphql';
 import {connectionArgs, connectionFromPromisedArray} from 'graphql-relay';
 import {getFulfillmentServices} from '../db';
 import {
@@ -7,9 +7,10 @@ import {
 } from './fulfillment_service';
 import {LocationType} from './location';
 import {nodeField} from './node';
+import {fulfillmentServiceMutation} from './mutations/fulfillment_service';
 
 export const RootQueryType = new GraphQLObjectType({
-  name: 'RootQueryType',
+  name: 'QueryRoot',
   fields: {
     fulfillmentService: {
       type: FulfillmentServiceType,
@@ -27,5 +28,12 @@ export const RootQueryType = new GraphQLObjectType({
       resolve: (_, args, context) =>
         connectionFromPromisedArray(getFulfillmentServices(args), args),
     },
+  },
+});
+
+export const RootMutationType = new GraphQLObjectType({
+  name: 'MutationRoot',
+  fields: {
+    addFulfillmentService: fulfillmentServiceMutation,
   },
 });

@@ -1,10 +1,11 @@
 import {GraphQLSchema} from 'graphql';
 import graphqlHTTP from 'express-graphql';
-import {RootQueryType} from './api/root';
+import {RootQueryType, RootMutationType} from './api/root';
 import {Router, NextFunction} from 'express';
 
 var programatticSchema = new GraphQLSchema({
   query: RootQueryType,
+  mutation: RootMutationType,
 });
 
 const asyncMiddleware = (fn: any) => (
