@@ -8,6 +8,7 @@ import {
 import {LocationType} from './location';
 import {nodeField} from './node';
 import {fulfillmentServiceMutation} from './mutations/fulfillment_service';
+import {locationMutation} from './mutations/location';
 
 export const RootQueryType = new GraphQLObjectType({
   name: 'QueryRoot',
@@ -35,5 +36,6 @@ export const RootMutationType = new GraphQLObjectType({
   name: 'MutationRoot',
   fields: {
     addFulfillmentService: fulfillmentServiceMutation,
+    addFulfillmentServiceLocation: locationMutation,
   },
 });

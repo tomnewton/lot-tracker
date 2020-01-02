@@ -1,6 +1,8 @@
 import {Datastore, Query} from '@google-cloud/datastore';
 import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
-import {ConnectionArguments} from 'graphql-relay';
+import {ConnectionArguments, fromGlobalId} from 'graphql-relay';
+import {getLocation} from 'graphql';
+import {resolve} from 'dns';
 
 // Creates a client
 const datastore = new Datastore();
@@ -19,13 +21,33 @@ export interface FulfillmentService {
 }
 
 export interface Location {
-  locationId: number;
-  currentLot: string;
+  name: string;
+  currentLotId: string;
+}
+
+export interface InventoryBatch {
+  name: string;
+  lotId: string;
+  quantity: number;
+  active: boolean;
+  kitted?: Date;
+  fulfillmentStarted?: Date;
+  fulfillmentEnded?: Date;
+  shopifyVariantId: string;
 }
 
 const KIND_FULFILLMENT_SERVICE = 'FulfillmentService';
 const KIND_USER = 'User';
 const KIND_LOCATION = 'Location';
+const KIND_INVENTORY_BATCH = 'InventoryBatch';
+
+// export async function newInventoryBatch(
+//   fulfillmentServiceId: string,
+//   locationId: string,
+//   inventoryBatch: InventoryBatch,
+// ): Promise<InventoryBatch> {
+
+}
 
 export async function newFulfillmentService(
   name: string,
@@ -42,6 +64,31 @@ export async function newFulfillmentService(
   return await get(fulfillmentServiceKey);
 }
 
+export async function newFulfillmentServiceLocation(
+  locationName: string,
+  fulfillmentServiceId: string,
+  currentLotId: string = '',
+): Promise<Location> {
+  const resolved = fromGlobalId(fulfillmentServiceId);
+  const fulfillmentServiceKey = getKeyFromURLSafeKey(resolved.id);
+
+  const locationKey = datastore.key([
+    ...fulfillmentServiceKey.path,
+    KIND_LOCATION,
+    locationName,
+  ]);
+
+  const location = {
+    key: locationKey,
+    data: {
+      name: locationName,
+      currentLotId: currentLotId,
+    },
+  };
+  await datastore.save(location);
+  return await get(locationKey);
+}
+
 export async function getFulfillmentServices(
   args: ConnectionArguments,
 ): Promise<FulfillmentService[]> {
@@ -56,14 +103,17 @@ export async function getFulfillmentServices(
 }
 
 export function getURLSafeKey(object: Entity): string {
-  //const val: entity.Key = object[entity.KEY_SYMBOL];
-  //return JSON.stringify(val.serialized);
-  //const val: KeyProto = entity.keyToKeyProto(object[entity.KEY_SYMBOL]);
   const urlsafe: entity.URLSafeKey = new entity.URLSafeKey();
   return urlsafe.legacyEncode(
     process.env.GOOGLE_CLOUD_PROJECT,
     object[entity.KEY_SYMBOL],
   );
+}
+
+function getKeyFromURLSafeKey(data: string): entity.Key {
+  const urlsafe: entity.URLSafeKey = new entity.URLSafeKey();
+  const output = urlsafe.legacyDecode(data);
+  return output;
 }
 
 export function getEntityKey(object: Entity): entity.Key {
@@ -76,6 +126,17 @@ export async function getLocations(
   const query: Query = datastore
     .createQuery(KIND_LOCATION)
     .hasAncestor(getEntityKey(fulfillmentService));
+
+  const result: any = await datastore.runQuery(query);
+  return result[0];
+}
+
+export async function getInventoryBatches(
+  location: Entity,
+): Promise<InventoryBatch[]> {
+  const query: Query = datastore
+    .createQuery(KIND_INVENTORY_BATCH)
+    .hasAncestor(getEntityKey(location));
 
   const result: any = await datastore.runQuery(query);
   return result[0];

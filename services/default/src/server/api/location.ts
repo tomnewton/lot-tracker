@@ -1,33 +1,39 @@
 import {
-  GraphQLInt,
   GraphQLObjectType,
   GraphQLResolveInfo,
   GraphQLString,
+  GraphQLNonNull,
 } from 'graphql';
-import {connectionDefinitions, globalIdField} from 'graphql-relay';
-import {getURLSafeKey} from '../db';
+import {
+  connectionDefinitions,
+  globalIdField,
+  connectionArgs,
+  connectionFromPromisedArray,
+} from 'graphql-relay';
+import {getURLSafeKey, Location, getInventoryBatches} from '../db';
 import {nodeInterface} from './node';
+import {InventoryBatchConnection} from './inventory_batch';
 
 export const LocationType = new GraphQLObjectType({
   name: 'Location',
   fields: {
     id: globalIdField(
       'Location',
-      (object: Location, context: any, info: GraphQLResolveInfo) => {
-        return getURLSafeKey(object);
+      (source: Location, context: any, info: GraphQLResolveInfo) => {
+        return getURLSafeKey(source);
       },
     ),
-    locationId: {
-      type: GraphQLInt,
-      resolve: (source, context, args) => {
-        return source.locationId;
+    name: {
+      type: new GraphQLNonNull(GraphQLString),
+      resolve: (source: Location, context, args) => {
+        return source.name;
       },
     },
-    currentLot: {
-      type: GraphQLString,
-      resolve: (source, context, args) => {
-        return source.currentLot;
-      },
+    inventoryBatches: {
+      type: InventoryBatchConnection,
+      args: connectionArgs,
+      resolve: (location: Location, args) =>
+        connectionFromPromisedArray(getInventoryBatches(location), args),
     },
   },
   interfaces: [nodeInterface],

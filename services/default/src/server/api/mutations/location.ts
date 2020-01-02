@@ -1,44 +1,45 @@
 import {mutationWithClientMutationId} from 'graphql-relay';
-import {GraphQLNonNull, GraphQLString, GraphQLID} from 'graphql';
+import {
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLID,
+  GraphQLResolveInfo,
+} from 'graphql';
+import {LocationType} from '../location';
+import {newFulfillmentServiceLocation} from '../../db';
 
-/*var shipMutation = mutationWithClientMutationId({
-  name: 'IntroduceShip',
+export const locationMutation = mutationWithClientMutationId({
+  name: 'AddFulfillmentServiceLocation',
   inputFields: {
-    shipName: {
+    fulfillmentServiceId: {
+      type: new GraphQLNonNull(GraphQLID),
+    },
+    locationName: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    factionId: {
-      type: new GraphQLNonNull(GraphQLID),
+    currentLotId: {
+      type: GraphQLString,
     },
   },
   outputFields: {
-    ship: {
-      type: shipType,
-      resolve: (payload) => data['Ship'][payload.shipId],
-    },
-    faction: {
-      type: factionType,
-      resolve: (payload) => data['Faction'][payload.factionId],
+    location: {
+      type: LocationType,
     },
   },
-  mutateAndGetPayload: ({shipName, factionId}) => {
-    var newShip = {
-      id: getNewShipId(),
-      name: shipName,
-    };
-    data.Ship[newShip.id] = newShip;
-    data.Faction[factionId].ships.push(newShip.id);
-    return {
-      shipId: newShip.id,
-      factionId: factionId,
-    };
-  },
+  mutateAndGetPayload: handle_mutation,
 });
 
-var mutationType = new GraphQLObjectType({
-  name: 'Mutation',
-  fields: () => ({
-    introduceShip: shipMutation,
-  }),
-});
-*/
+async function handle_mutation(
+  object: any,
+  context: any,
+  info: GraphQLResolveInfo,
+): Promise<object> {
+  const location = await newFulfillmentServiceLocation(
+    object.locationName,
+    object.fulfillmentServiceId,
+    object.currentLotId,
+  );
+  return {
+    location: location,
+  };
+}
