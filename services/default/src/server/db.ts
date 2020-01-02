@@ -46,8 +46,7 @@ const KIND_INVENTORY_BATCH = 'InventoryBatch';
 //   locationId: string,
 //   inventoryBatch: InventoryBatch,
 // ): Promise<InventoryBatch> {
-
-}
+//}
 
 export async function newFulfillmentService(
   name: string,
