@@ -36,7 +36,7 @@ export const LocationType = new GraphQLObjectType({
         connectionFromPromisedArray(getInventoryBatches(location), args),
     },
   },
-  interfaces: [nodeInterface],
+  interfaces: () => [nodeInterface],
 });
 
 export const {connectionType: LocationConnection} = connectionDefinitions({

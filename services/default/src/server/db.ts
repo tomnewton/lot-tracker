@@ -41,12 +41,36 @@ const KIND_USER = 'User';
 const KIND_LOCATION = 'Location';
 const KIND_INVENTORY_BATCH = 'InventoryBatch';
 
-// export async function newInventoryBatch(
-//   fulfillmentServiceId: string,
-//   locationId: string,
-//   inventoryBatch: InventoryBatch,
-// ): Promise<InventoryBatch> {
-//}
+export async function newInventoryBatch(
+  locationId: string,
+  inventoryBatch: InventoryBatch,
+): Promise<InventoryBatch> {
+  const l_resolved = fromGlobalId(locationId);
+  const locationKey = getKeyFromURLSafeKey(l_resolved.id);
+
+  const key = datastore.key([
+    ...locationKey.path,
+    KIND_INVENTORY_BATCH,
+    inventoryBatch.lotId,
+  ]);
+
+  const entity = {
+    key: key,
+    data: inventoryBatch,
+  };
+
+  await datastore.save(entity);
+  return await get(key);
+}
+
+export async function getInventoryBatch(
+  inventoryBatchId: string,
+): Promise<InventoryBatch> {
+  const inventoryBatchKey = getKeyFromURLSafeKey(
+    fromGlobalId(inventoryBatchId).id,
+  );
+  return await get(inventoryBatchKey);
+}
 
 export async function newFulfillmentService(
   name: string,
@@ -110,9 +134,8 @@ export function getURLSafeKey(object: Entity): string {
 }
 
 function getKeyFromURLSafeKey(data: string): entity.Key {
-  const urlsafe: entity.URLSafeKey = new entity.URLSafeKey();
-  const output = urlsafe.legacyDecode(data);
-  return output;
+  const urlsafe = new entity.URLSafeKey();
+  return urlsafe.legacyDecode(data);
 }
 
 export function getEntityKey(object: Entity): entity.Key {

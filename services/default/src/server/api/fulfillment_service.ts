@@ -28,7 +28,7 @@ export const FulfillmentServiceType = new GraphQLObjectType({
         connectionFromPromisedArray(getLocations(fulfillmentService), args),
     },
   },
-  interfaces: [nodeInterface],
+  interfaces: () => [nodeInterface],
 });
 
 export const {

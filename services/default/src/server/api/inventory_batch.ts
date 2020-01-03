@@ -3,17 +3,16 @@ import {
   GraphQLResolveInfo,
   GraphQLString,
   GraphQLNonNull,
-  GraphQLFloat,
   GraphQLBoolean,
   GraphQLScalarType,
   GraphQLInt,
 } from 'graphql';
 import {Kind} from 'graphql/language';
 import {connectionDefinitions, globalIdField} from 'graphql-relay';
-import {getURLSafeKey, Location, InventoryBatch} from '../db';
+import {getURLSafeKey, InventoryBatch} from '../db';
 import {nodeInterface} from './node';
 
-const DateType = new GraphQLScalarType({
+export const DateType = new GraphQLScalarType({
   name: 'Date',
   serialize: (value: Date) => value.getTime(),
   parseValue: (value: any) => new Date(value),
@@ -27,6 +26,8 @@ const DateType = new GraphQLScalarType({
 
 export const InventoryBatchType = new GraphQLObjectType({
   name: 'InventoryBatch',
+  description: 'A batch with a lot number being fulfilled.',
+  interfaces: () => [nodeInterface],
   fields: {
     id: globalIdField(
       'InventoryBatch',
@@ -83,7 +84,6 @@ export const InventoryBatchType = new GraphQLObjectType({
       },
     },
   },
-  interfaces: [nodeInterface],
 });
 
 export const {connectionType: InventoryBatchConnection} = connectionDefinitions(

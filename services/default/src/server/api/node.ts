@@ -3,6 +3,7 @@ import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
 import {getEntityKey, get} from '../db';
 import {FulfillmentServiceType} from './fulfillment_service';
 import {LocationType} from './location';
+import {InventoryBatchType} from './inventory_batch';
 import {GraphQLObjectType, GraphQLResolveInfo} from 'graphql';
 
 export const {nodeInterface, nodeField} = nodeDefinitions(
@@ -27,6 +28,8 @@ function type_resolver(obj: Entity): GraphQLObjectType {
       return FulfillmentServiceType;
     case LocationType.name:
       return LocationType;
+    case InventoryBatchType.name:
+      return InventoryBatchType;
     default:
       return null;
   }
