@@ -1,16 +1,14 @@
-import {mutationWithClientMutationId} from 'graphql-relay';
 import {
-  GraphQLNonNull,
+  GraphQLBoolean,
   GraphQLID,
+  GraphQLInt,
+  GraphQLNonNull,
   GraphQLResolveInfo,
   GraphQLString,
-  GraphQLInt,
-  GraphQLBoolean,
 } from 'graphql';
-import {LocationType} from '../location';
+import {mutationWithClientMutationId} from 'graphql-relay';
 import {newInventoryBatch} from '../../db';
-import {InventoryBatchType} from '../inventory_batch';
-import {DateType} from '../inventory_batch';
+import {DateType, InventoryBatchType} from '../inventory_batch';
 
 export const inventoryBatchMutation = mutationWithClientMutationId({
   name: 'AddInventoryBatch',
