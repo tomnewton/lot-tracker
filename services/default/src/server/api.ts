@@ -1,29 +1,60 @@
-import {GraphQLSchema} from 'graphql';
-import graphqlHTTP from 'express-graphql';
-import {RootQueryType, RootMutationType} from './api/root';
-import {Router, NextFunction} from 'express';
+import {ApolloServer, gql} from 'apollo-server-express';
+import FulfillmentServiceAPI from './datasource';
 
-var programatticSchema = new GraphQLSchema({
-  query: RootQueryType,
-  mutation: RootMutationType,
-});
+// Construct a schema, using GraphQL schema language
+const typeDefs = gql`
+  type FulfillmentService {
+    id: ID!
+    name: String
+    locations: [Location]
+  }
 
-const asyncMiddleware = (fn: any) => (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
+  type Location {
+    id: ID!
+    name: String
+    inventoryBatches: [InventoryBatch]
+  }
+
+  type InventoryBatch {
+    id: ID!
+    name: String
+    lotId: String
+    quantity: Int
+    active: Boolean
+  }
+
+  type Query {
+    fulfillmentService(id: ID!): FulfillmentService
+    fulfillmentServices: [FulfillmentService]
+  }
+`;
+
+// Provide resolver functions for your schema fields
+const resolvers = {
+  Query: {
+    fulfillmentServices: async (
+      obj,
+      args,
+      {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
+    ) => {
+      return await api.getFulfillmentServices();
+    },
+    fulfillmentService: async (
+      obj,
+      {id}: {id: string},
+      {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
+    ) => {
+      return api.getFulfillmentService(id);
+    },
+  },
 };
 
-export const api = Router();
-
-api.use(
-  '/graphql',
-  graphqlHTTP(async (request, response, graphQLParams) => {
+export const api = new ApolloServer({
+  typeDefs,
+  resolvers,
+  dataSources: () => {
     return {
-      schema: programatticSchema,
-      graphiql: true,
+      api: new FulfillmentServiceAPI(),
     };
-  }),
-);
+  },
+});

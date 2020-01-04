@@ -13,6 +13,7 @@ import {upsertUser, User} from './db';
 import {setupENV} from './env';
 import {webhooks} from './webhooks';
 import {worker} from './worker';
+import {addErrorLoggingToSchema} from 'apollo-server-express';
 const lb = require('@google-cloud/logging-bunyan');
 const DatastoreStore = require('@google-cloud/connect-datastore')(session);
 
@@ -107,7 +108,7 @@ export async function startApp(): Promise<express.Application> {
     next();
   });
 
-  app.use('/api', api);
+  api.applyMiddleware({app: app, path: '/api'});
 
   app.get(LOGIN_PATH, (req: express.Request, res: express.Response) => {
     res.render('login.html', {oauth_redirect_url: process.env.OAUTH_REDIRECT});
@@ -143,6 +144,17 @@ export async function startApp(): Promise<express.Application> {
   app.get('/', (req: express.Request, res: express.Response) => {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
   });
+
+  // Error handler
+  const errorHandler = (err, req, res, next) => {
+    req.log.error(err.message);
+    if (res.headersSent) {
+      return next(err);
+    }
+    const {status} = err;
+    res.status(status).json(err);
+  };
+  app.use(errorHandler);
 
   return app;
 }

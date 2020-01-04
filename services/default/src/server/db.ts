@@ -112,19 +112,6 @@ export async function newFulfillmentServiceLocation(
   return await get(locationKey);
 }
 
-export async function getFulfillmentServices(
-  args: ConnectionArguments,
-): Promise<FulfillmentService[]> {
-  const query = datastore.createQuery(KIND_FULFILLMENT_SERVICE);
-
-  if (args.first) {
-    query.limit(args.first);
-  }
-
-  const result = await datastore.runQuery(query);
-  return result[0];
-}
-
 export function getURLSafeKey(object: Entity): string {
   const urlsafe: entity.URLSafeKey = new entity.URLSafeKey();
   return urlsafe.legacyEncode(
