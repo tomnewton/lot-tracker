@@ -37,7 +37,7 @@ const resolvers = {
       __: any,
       {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
     ) => {
-      return await api.getFulfillmentServices();
+      return api.getFulfillmentServices();
     },
     fulfillmentService: async (
       _: any,
