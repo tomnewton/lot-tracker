@@ -33,14 +33,14 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     fulfillmentServices: async (
-      obj,
-      args,
+      _: any,
+      __: any,
       {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
     ) => {
       return await api.getFulfillmentServices();
     },
     fulfillmentService: async (
-      obj,
+      _: any,
       {id}: {id: string},
       {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
     ) => {

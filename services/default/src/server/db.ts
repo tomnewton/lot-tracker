@@ -1,8 +1,6 @@
 import {Datastore, Query} from '@google-cloud/datastore';
 import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
-import {ConnectionArguments, fromGlobalId} from 'graphql-relay';
-import {getLocation} from 'graphql';
-import {resolve} from 'dns';
+import {fromGlobalId} from 'graphql-relay';
 
 // Creates a client
 const datastore = new Datastore();
