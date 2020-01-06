@@ -4,13 +4,23 @@ const typeDefs = gql`
   type FulfillmentService {
     id: ID!
     name: String
-    locations: [Location]
+    locations: Locations
+  }
+
+  type FulfillmentServices {
+    cursor: string
+    items: [FulfillmentService]
   }
 
   type Location {
     id: ID!
     name: String
-    inventoryBatches: [InventoryBatch]
+    inventoryBatches: InventoryBatches
+  }
+
+  type Locations {
+    cursor: string
+    items: [Location]
   }
 
   type InventoryBatch {
@@ -19,6 +29,11 @@ const typeDefs = gql`
     lotId: String
     quantity: Int
     active: Boolean
+  }
+
+  type InventoryBatches {
+    cursor: string
+    items: [InventoryBatch]
   }
 
   type Query {
