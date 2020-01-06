@@ -1,13 +1,12 @@
-import {webhooks} from '../webhooks';
-const request = require('supertest');
-//import request from 'supertest';
-import express, {NextFunction} from 'express';
 import bodyParser from 'body-parser';
+//import request from 'supertest';
+import express from 'express';
+import {webhooks} from '../webhooks';
 import {setupENV} from './../env';
+import {client, createTask} from './../tasks';
+const request = require('supertest');
 
 jest.mock('./../tasks');
-
-import {createTask, client} from './../tasks';
 
 describe('webhook handler tests', () => {
   let app;
