@@ -1,51 +1,16 @@
-import {ApolloServer, gql} from 'apollo-server-express';
+import {ApolloServer} from 'apollo-server-express';
+import typeDefs from './schema';
 import FulfillmentServiceAPI from './datasource';
-
-// Construct a schema, using GraphQL schema language
-const typeDefs = gql`
-  type FulfillmentService {
-    id: ID!
-    name: String
-    locations: [Location]
-  }
-
-  type Location {
-    id: ID!
-    name: String
-    inventoryBatches: [InventoryBatch]
-  }
-
-  type InventoryBatch {
-    id: ID!
-    name: String
-    lotId: String
-    quantity: Int
-    active: Boolean
-  }
-
-  type Query {
-    fulfillmentService(id: ID!): FulfillmentService
-    fulfillmentServices: [FulfillmentService]
-  }
-`;
+import {
+  fulfillmentServices as resolveFulfillmentServices,
+  fulfillmentService as resolveFulfillmentService,
+} from './resolvers/fulfillment_service';
 
 // Provide resolver functions for your schema fields
 const resolvers = {
   Query: {
-    fulfillmentServices: async (
-      _: any,
-      __: any,
-      {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
-    ) => {
-      return api.getFulfillmentServices();
-    },
-    fulfillmentService: async (
-      _: any,
-      {id}: {id: string},
-      {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
-    ) => {
-      return api.getFulfillmentService(id);
-    },
+    fulfillmentServices: resolveFulfillmentServices,
+    fulfillmentService: resolveFulfillmentService,
   },
 };
 
