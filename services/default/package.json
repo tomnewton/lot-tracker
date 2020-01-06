@@ -6,10 +6,7 @@
         "build": "rm -rf ./dist/server && ./node_modules/.bin/tsc && yarn copy-templates && yarn copy-dot-env && rm -rf ./dist/client",
         "start-dev": "rm -rf ./dist/server && yarn build && yarn start",
         "start": "node ./dist/server/server.js",
-        "test": "./node_modules/.bin/jest --rootDir=./src/server",
-        "copy-templates": "copyfiles -u 1 src/**/*.html ./dist",
-        "copy-dot-env": "copyfiles -u 1 ../../.env ./dist",
-        "release-build": "./node_modules/.bin/tsc && yarn copy-templates && yarn copy-dot-env && rm -rf ./dist/client"
+        "test": "./node_modules/.bin/jest --rootDir=./src/server"
     },
     "prettier": {
         "printWidth": 80,
