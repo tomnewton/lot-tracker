@@ -1,17 +1,17 @@
 import FulfillmentServiceAPI from '../datasource';
+import {Entity} from '@google-cloud/datastore/build/src/entity';
+import {CollectionResolver, EntityResolver} from './interfaces';
 
-export const fulfillmentServices = async (
-  _: any,
-  __: any,
-  {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
-) => {
-  return api.getFulfillmentServices();
+export const fulfillmentServices: CollectionResolver<
+  Entity,
+  FulfillmentServiceAPI
+> = async (parent, args, context, info): Promise<Entity[]> => {
+  return context.dataSources.api.getFulfillmentServices();
 };
 
-export const fulfillmentService = async (
-  _: any,
-  {id}: {id: string},
-  {dataSources: {api}}: {dataSources: {api: FulfillmentServiceAPI}},
-) => {
-  return api.getFulfillmentService(id);
+export const fulfillmentService: EntityResolver<
+  Entity,
+  FulfillmentServiceAPI
+> = async (parent, args, context, info): Promise<Entity> => {
+  return context.dataSources.api.getFulfillmentService(args.id);
 };

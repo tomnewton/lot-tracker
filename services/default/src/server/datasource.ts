@@ -47,13 +47,20 @@ class ServiceAPI extends ApiBase {
     return await super.fetch(id);
   }
 
-  async getFulfillmentServices(args?: any): Promise<Entity[]> {
+  async getFulfillmentServices(
+    cursor?: string,
+    limit: number = 20,
+  ): Promise<Entity[]> {
     const query = this._db.createQuery(
       GoogleDatasource.KIND_FULFILLMENT_SERVICE,
     );
 
-    if (args && args.first) {
-      query.limit(args.first);
+    if (limit) {
+      query.limit(limit);
+    }
+
+    if (cursor) {
+      query.start(cursor);
     }
 
     const result = await this._db.runQuery(query);
@@ -94,7 +101,7 @@ class FulfillmentServiceAPI extends GoogleDatasource {
     super();
   }
 
-  public async getFulfillmentServices(): Promise<Entity[]> {
+  public async getFulfillmentServices(cursor?: string): Promise<Entity[]> {
     const result = await this._api.getFulfillmentServices();
     return result;
   }
