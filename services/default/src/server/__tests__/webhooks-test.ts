@@ -12,7 +12,7 @@ import {createTask, client} from './../tasks';
 describe('webhook handler tests', () => {
   let app;
 
-  beforeAll((done) => {
+  beforeAll(async (done) => {
     app = express();
     app.use(bodyParser.raw());
     app.use('/webhooks', webhooks);
