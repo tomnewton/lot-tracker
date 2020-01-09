@@ -1,7 +1,6 @@
-import {DataSource, DataSourceConfig} from 'apollo-datasource';
 import {Datastore} from '@google-cloud/datastore';
 import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
-import {nonExecutableDefinitionMessage} from 'graphql/validation/rules/ExecutableDefinitions';
+import {DataSource, DataSourceConfig} from 'apollo-datasource';
 
 class ApiBase {
   protected _db: Datastore;

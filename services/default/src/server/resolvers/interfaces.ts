@@ -1,13 +1,16 @@
+type ArgsCursor = {cursor?: string};
+type ArgsWithId = {id?: string};
+
 export type CollectionResolver<T, A> = (
   parent: any,
-  args: {cursor?: string},
+  args: ArgsCursor,
   context: {dataSources: {api: A}},
   info: any,
 ) => Promise<T[]>;
 
 export type EntityResolver<T, A> = (
   parent: any,
-  args: {id?: string},
+  args: ArgsWithId,
   context: {dataSources: {api: A}},
   info: any,
 ) => Promise<T>;

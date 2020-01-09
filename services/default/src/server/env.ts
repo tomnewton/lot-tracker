@@ -8,6 +8,15 @@ export function setupENV() {
   } else {
     process.env.REDIRECT_URI = 'http://localhost:8080';
     process.env.COOKIE_DOMAIN = 'localhost';
+    process.env.GOOGLE_CLOUD_PROJECT = 'theta-window-254420';
+  }
+
+  if (process.env.NODE_ENV == 'test') {
+    process.env.DATASTORE_DATASET = 'test';
+    process.env.DATASTORE_EMULATOR_HOST = 'localhost:8081';
+    process.env.DATASTORE_EMULATOR_HOST_PATH = 'localhost:8081/datastore';
+    process.env.DATASTORE_HOST = 'http://localhost:8081';
+    process.env.DATASTORE_PROJECT_ID = 'test';
   }
 
   process.env.OAUTH_REDIRECT = process.env.REDIRECT_URI + '/authcode';
@@ -16,6 +25,4 @@ export function setupENV() {
   process.env.LOCATION = 'us-central1';
   process.env.DEFAULT_QUEUE = 'default';
   process.env.NIXIT_DOMAIN = 'letsnixit.com';
-
-  console.log(process.env.COOKIE_DOMAIN);
 }
