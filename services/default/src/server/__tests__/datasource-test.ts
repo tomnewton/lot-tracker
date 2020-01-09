@@ -30,12 +30,14 @@ describe('Datasource test suite for Google Cloud Datastore.', () => {
     done();
   });
 
-  afterEach(async () => {
+  afterEach(async (done) => {
     await clearDatastoreEmulator();
+    done();
   });
 
-  afterAll(async () => {
+  afterAll(async (done) => {
     await emulator.stop();
+    done();
   });
 
   async function clearDatastoreEmulator(): Promise<void> {
@@ -86,6 +88,7 @@ describe('Datasource test suite for Google Cloud Datastore.', () => {
       entity.id,
     );
     expect(entity).toStrictEqual(getResult);
+    //test
 
     await dataSource.fulfillmentService.delete(entity.id);
     getResult = await dataSource.fulfillmentService.get(entity.id);

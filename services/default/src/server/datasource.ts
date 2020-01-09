@@ -56,7 +56,14 @@ class ApiBase {
   }
 }
 
-class FulfillmentServiceAPI extends ApiBase {
+interface IDatasourceAPI {
+  create(input: any): Promise<Entity>;
+  get(id: string): Promise<Entity>;
+  list(limit: number, cursor?: string): Promise<Entity[]>;
+  delete(id: string): Promise<void>;
+}
+
+class FulfillmentServiceAPI extends ApiBase implements IDatasourceAPI {
   async create(input: FulfillmentServiceInput): Promise<Entity> {
     const kind = GoogleDatasource.KIND_FULFILLMENT_SERVICE;
     const fulfillmentServiceKey = this._db.key([kind, input.name]);
@@ -73,7 +80,7 @@ class FulfillmentServiceAPI extends ApiBase {
     return await super.fetch(id);
   }
 
-  async list(cursor?: string, limit: number = 20): Promise<Entity[]> {
+  async list(limit: number = 20, cursor?: string): Promise<Entity[]> {
     const query = this._db.createQuery(
       GoogleDatasource.KIND_FULFILLMENT_SERVICE,
     );
