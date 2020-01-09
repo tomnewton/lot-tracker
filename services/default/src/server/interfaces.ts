@@ -3,6 +3,11 @@ export interface FulfillmentService {
   name: string;
   locations: Location[];
 }
+
+export interface FulfillmentServiceInput {
+  name: string;
+}
+
 export interface Location {
   id: string;
   name: string;

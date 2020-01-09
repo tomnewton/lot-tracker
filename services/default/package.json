@@ -50,16 +50,18 @@
         "@types/jest": "^24.0.18",
         "@types/mustache-express": "^1.2.1",
         "@types/node": "^12.7.1",
+        "@types/request-promise-native": "^1.0.17",
         "@types/supertest": "^2.0.8",
         "copyfiles": "^2.1.1",
         "google-datastore-emulator": "^3.0.1",
         "jest": "^24.8.0",
         "prettier": "1.18.2",
+        "request-promise-native": "^1.0.8",
         "superagent": "^5.1.0",
         "supertest": "^4.0.2",
         "ts-jest": "^24.3.0",
         "typescript": "^3.5.3"
-    }, 
+    },
     "transform": {
         "^.+\\.(t|j)sx?$": "ts-jest"
     }

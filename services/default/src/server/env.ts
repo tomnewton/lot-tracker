@@ -15,6 +15,7 @@ export function setupENV() {
     process.env.DATASTORE_DATASET = 'test';
     process.env.DATASTORE_EMULATOR_HOST = 'localhost:8081';
     process.env.DATASTORE_EMULATOR_HOST_PATH = 'localhost:8081/datastore';
+    process.env.DATASTORE_RESET_URL = 'http://localhost:8081/reset';
     process.env.DATASTORE_HOST = 'http://localhost:8081';
     process.env.DATASTORE_PROJECT_ID = 'test';
   }

@@ -1,6 +1,11 @@
 import {Datastore} from '@google-cloud/datastore';
 import {entity, Entity} from '@google-cloud/datastore/build/src/entity';
+import {
+  DeleteResponse,
+  InsertResponse,
+} from '@google-cloud/datastore/build/src/request';
 import {DataSource, DataSourceConfig} from 'apollo-datasource';
+import {FulfillmentServiceInput} from './interfaces';
 
 class ApiBase {
   protected _db: Datastore;
@@ -8,15 +13,23 @@ class ApiBase {
     this._db = db;
   }
 
-  protected async fetch(key: entity.Key | string): Promise<Entity> {
+  protected async fetch(key: entity.Key | string): Promise<Entity> | null {
     if (typeof key === 'string') {
       key = this.toKey(key);
     }
-    const result: Entity = await this._db.get(key);
-    return result[0];
+    const getResponse = await this._db.get(key);
+    const response = this.setIDs(getResponse);
+    return response[0];
   }
 
-  protected getURLSafeKey(object: Entity): string {
+  protected async delete(key: entity.Key | string): Promise<void> {
+    if (typeof key === 'string') {
+      key = this.toKey(key);
+    }
+    const deleteResponse: DeleteResponse = await this._db.delete(key);
+  }
+
+  public getURLSafeKey(object: Entity): string {
     const urlsafe: entity.URLSafeKey = new entity.URLSafeKey();
     return urlsafe.legacyEncode(
       process.env.GOOGLE_CLOUD_PROJECT,
@@ -35,21 +48,32 @@ class ApiBase {
 
   protected setIDs(entities: Entity[]): Entity[] {
     return entities.map((el: Entity) => {
-      el.id = this.getURLSafeKey(el);
-      return el;
+      if (el) {
+        el.id = this.getURLSafeKey(el);
+        return el;
+      }
     });
   }
 }
 
-class ServiceAPI extends ApiBase {
-  async getFulfillmentService(id: string): Promise<Entity> {
+class FulfillmentServiceAPI extends ApiBase {
+  async create(input: FulfillmentServiceInput): Promise<Entity> {
+    const kind = GoogleDatasource.KIND_FULFILLMENT_SERVICE;
+    const fulfillmentServiceKey = this._db.key([kind, input.name]);
+    const entity = {
+      key: fulfillmentServiceKey,
+      data: input,
+    };
+
+    const result: InsertResponse = await this._db.insert(entity);
+    return this.fetch(fulfillmentServiceKey);
+  }
+
+  async get(id: string): Promise<Entity> | null {
     return await super.fetch(id);
   }
 
-  async getFulfillmentServices(
-    cursor?: string,
-    limit: number = 20,
-  ): Promise<Entity[]> {
+  async list(cursor?: string, limit: number = 20): Promise<Entity[]> {
     const query = this._db.createQuery(
       GoogleDatasource.KIND_FULFILLMENT_SERVICE,
     );
@@ -66,12 +90,8 @@ class ServiceAPI extends ApiBase {
     return super.setIDs(result[0]);
   }
 
-  toKey(id: string): entity.Key {
-    return super.toKey(id);
-  }
-
-  getURLSafeKey(obj: Entity): string {
-    return super.getURLSafeKey(obj);
+  async delete(id: string): Promise<void> {
+    await super.delete(id);
   }
 }
 
@@ -80,34 +100,19 @@ class GoogleDatasource extends DataSource {
   public static readonly KIND_LOCATION = 'Location';
   public static readonly KIND_INVENTORY_BATCH = 'InventoryBatch';
 
-  protected _api: ServiceAPI;
+  protected _fulfillmentServiceAPI: FulfillmentServiceAPI;
+
+  public get fulfillmentService(): FulfillmentServiceAPI {
+    return this._fulfillmentServiceAPI;
+  }
+
+  constructor() {
+    super();
+    this._fulfillmentServiceAPI = new FulfillmentServiceAPI(new Datastore());
+  }
 
   //TODO: add caching.
-  constructor() {
-    super();
-    this._api = new ServiceAPI(new Datastore());
-  }
-
   public initialize(conifg: DataSourceConfig<any>) {}
-
-  public resolve_id(obj: Entity): string {
-    return this._api.getURLSafeKey(obj);
-  }
 }
 
-class FulfillmentServiceAPI extends GoogleDatasource {
-  constructor() {
-    super();
-  }
-
-  public async getFulfillmentServices(cursor?: string): Promise<Entity[]> {
-    const result = await this._api.getFulfillmentServices();
-    return result;
-  }
-
-  public async getFulfillmentService(id: string): Promise<Entity> {
-    return await this._api.getFulfillmentService(id);
-  }
-}
-
-export default FulfillmentServiceAPI;
+export default GoogleDatasource;
