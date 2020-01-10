@@ -40,6 +40,11 @@ const typeDefs = gql`
     fulfillmentService(id: ID!): FulfillmentService
     fulfillmentServices: [FulfillmentService]
   }
+
+  type Mutation {
+    createFulfillmentService(name: string): FulfillmentService
+    deleteFulfillmentService(id: ID!): FulfillmentService
+  }
 `;
 
 export default typeDefs;

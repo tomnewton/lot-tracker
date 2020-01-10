@@ -1,9 +1,9 @@
 import {Entity} from '@google-cloud/datastore/build/src/entity';
 import Emulator from 'google-datastore-emulator';
 import request from 'request-promise-native';
+import {setupENV} from '../../env';
+import {FulfillmentService} from '../../interfaces';
 import GoogleDatasource from '../datasource';
-import {setupENV} from '../env';
-import {FulfillmentService} from '../interfaces';
 
 setupENV();
 jest.setTimeout(30000);
@@ -87,8 +87,8 @@ describe('Datasource test suite for Google Cloud Datastore.', () => {
     let getResult: FulfillmentService = await dataSource.fulfillmentService.get(
       entity.id,
     );
+
     expect(entity).toStrictEqual(getResult);
-    //test
 
     await dataSource.fulfillmentService.delete(entity.id);
     getResult = await dataSource.fulfillmentService.get(entity.id);

@@ -5,7 +5,7 @@ import {
   InsertResponse,
 } from '@google-cloud/datastore/build/src/request';
 import {DataSource, DataSourceConfig} from 'apollo-datasource';
-import {FulfillmentServiceInput} from './interfaces';
+import {FulfillmentServiceInput} from '../interfaces';
 
 class ApiBase {
   protected _db: Datastore;
@@ -59,7 +59,7 @@ class ApiBase {
 interface IDatasourceAPI {
   create(input: any): Promise<Entity>;
   get(id: string): Promise<Entity>;
-  list(limit: number, cursor?: string): Promise<Entity[]>;
+  list(cursor: string, limit: number): Promise<Entity[]>;
   delete(id: string): Promise<void>;
 }
 
@@ -80,7 +80,10 @@ class FulfillmentServiceAPI extends ApiBase implements IDatasourceAPI {
     return await super.fetch(id);
   }
 
-  async list(limit: number = 20, cursor?: string): Promise<Entity[]> {
+  async list(
+    cursor: string = undefined,
+    limit: number = 20,
+  ): Promise<Entity[]> {
     const query = this._db.createQuery(
       GoogleDatasource.KIND_FULFILLMENT_SERVICE,
     );

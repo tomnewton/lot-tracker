@@ -14,3 +14,10 @@ export type EntityResolver<T, A> = (
   context: {dataSources: {api: A}},
   info: any,
 ) => Promise<T>;
+
+export type BasicResolver<T, A, G> = (
+  parent: any,
+  args: G,
+  context: {dataSources: {api: A}},
+  info: any,
+) => Promise<T>;

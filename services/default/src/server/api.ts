@@ -1,10 +1,10 @@
 import {ApolloServer} from 'apollo-server-express';
-import typeDefs from './schema';
-import FulfillmentServiceAPI from './datasource';
+import FulfillmentServiceAPI from './db/datasource';
 import {
-  fulfillmentServices as resolveFulfillmentServices,
   fulfillmentService as resolveFulfillmentService,
+  fulfillmentServices as resolveFulfillmentServices,
 } from './resolvers/fulfillment_service';
+import typeDefs from './schema';
 
 // Provide resolver functions for your schema fields
 const resolvers = {

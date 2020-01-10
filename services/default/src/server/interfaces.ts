@@ -1,7 +1,10 @@
-export interface FulfillmentService {
+export interface FulfillmentService extends FulfillmentServiceInput {
   id: string;
-  name: string;
   locations: Location[];
+}
+
+export interface FulfillmentServiceInput {
+  name: string;
 }
 
 export interface FulfillmentServiceInput {
@@ -13,6 +16,7 @@ export interface Location {
   name: string;
   inventoryBatches: InventoryBatch[];
 }
+
 export interface InventoryBatch {
   id: string;
   name: string;
