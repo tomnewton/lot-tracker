@@ -7,7 +7,6 @@ import {
 } from './resolvers/fulfillment_service';
 import typeDefs from './schema';
 
-// Provide resolver functions for your schema fields
 const resolvers = {
   Query: {
     fulfillmentServices: resolveFulfillmentServices,
