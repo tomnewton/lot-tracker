@@ -5,7 +5,6 @@ import {
   InsertResponse,
 } from '@google-cloud/datastore/build/src/request';
 import {FulfillmentServiceInput} from '../interfaces';
-import GoogleDatasource from './datasource';
 
 class ApiBase {
   protected _db: Datastore;
@@ -64,8 +63,10 @@ interface IDatasourceAPI {
 }
 
 class FulfillmentServiceAPI extends ApiBase implements IDatasourceAPI {
+  public static readonly KIND = 'FulfillmentService';
+
   async create(input: FulfillmentServiceInput): Promise<Entity> {
-    const kind = GoogleDatasource.KIND_FULFILLMENT_SERVICE;
+    const kind = FulfillmentServiceAPI.KIND;
     const fulfillmentServiceKey = this._db.key([kind, input.name]);
     const entity = {
       key: fulfillmentServiceKey,
@@ -84,9 +85,7 @@ class FulfillmentServiceAPI extends ApiBase implements IDatasourceAPI {
     cursor: string = undefined,
     limit: number = 20,
   ): Promise<Entity[]> {
-    const query = this._db.createQuery(
-      GoogleDatasource.KIND_FULFILLMENT_SERVICE,
-    );
+    const query = this._db.createQuery(FulfillmentServiceAPI.KIND);
 
     if (limit) {
       query.limit(limit);
