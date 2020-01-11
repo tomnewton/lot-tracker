@@ -2,7 +2,6 @@ import {Entity} from '@google-cloud/datastore/build/src/entity';
 import {default as GoogleDatasource} from '../db/datasource';
 import {FulfillmentServiceInput} from '../interfaces';
 import {BasicResolver, CollectionResolver, EntityResolver} from './interfaces';
-
 export const fulfillmentServices: CollectionResolver<
   Entity,
   GoogleDatasource

@@ -5,6 +5,7 @@ import {
   InsertResponse,
 } from '@google-cloud/datastore/build/src/request';
 import {FulfillmentServiceInput} from '../interfaces';
+import {IDatasourceAPI} from './interface';
 
 class ApiBase {
   protected _db: Datastore;
@@ -55,14 +56,7 @@ class ApiBase {
   }
 }
 
-interface IDatasourceAPI {
-  create(input: any): Promise<Entity>;
-  get(id: string): Promise<Entity>;
-  list(cursor: string, limit: number): Promise<Entity[]>;
-  delete(id: string): Promise<void>;
-}
-
-class FulfillmentServiceAPI extends ApiBase implements IDatasourceAPI {
+class FulfillmentServiceAPI extends ApiBase implements IDatasourceAPI<Entity> {
   public static readonly KIND = 'FulfillmentService';
 
   async create(input: FulfillmentServiceInput): Promise<Entity> {

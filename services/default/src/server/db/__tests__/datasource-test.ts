@@ -93,5 +93,6 @@ describe('Datasource test suite for Google Cloud Datastore.', () => {
     await dataSource.fulfillmentService.delete(entity.id);
     getResult = await dataSource.fulfillmentService.get(entity.id);
     expect(getResult).toBeNull;
+    expect(1).toBe(1);
   });
 });
