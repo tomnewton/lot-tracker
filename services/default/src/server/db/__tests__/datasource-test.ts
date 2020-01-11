@@ -3,7 +3,7 @@ import Emulator from 'google-datastore-emulator';
 import request from 'request-promise-native';
 import {setupENV} from '../../env';
 import {FulfillmentService} from '../../interfaces';
-import GoogleDatasource from '../datasource';
+import GoogleDatasource from '../google';
 
 setupENV();
 jest.setTimeout(30000);
